@@ -1,0 +1,17 @@
+
+namespace mcp;
+
+let ccval = { ref 0 | i = 0..127 };
+let ccstrip = { ref i | i = 0..127 };
+
+getval num = get (ccval!int num) if num>=0 && num<=127;
+= 0 otherwise;
+
+setval num val = put (ccval!int num) val if num>=0 && num<=127;
+= () otherwise;
+
+getstrip num = get (ccstrip!int num) if num>=0 && num<=127;
+= () otherwise;
+
+setstrip num strip = put (ccstrip!int num) strip if num>=0 && num<=127;
+= () otherwise;

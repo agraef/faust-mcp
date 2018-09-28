@@ -1,0 +1,28 @@
+
+using mcpstate;
+
+public ctl bend;
+
+extern void pd_send(char*, expr*);
+
+mcp2ctl (bend val chan) = convert (bend val (chan-16)) if chan >= 17 with
+  convert (bend val chan) = ctl v num 1 when
+    v = (val+8192)/128;
+    num = chan-1;
+    pd_send "midiout" (ctl v num 1);
+  end;
+end;
+
+mcp2ctl (ctl val num chan) = convert (ctl val num (chan-16)) if chan >= 17 with
+  convert (ctl val num chan) = ctl (change num val chan) num 1 when
+    num = num-16;
+  end;
+  change num val chan = v when
+    // sign-bit encoder value
+    val = if val < 64 then val else 64-val;
+    v = (max 0.min 127) (mcp::getval num + val);
+    pd_send "midiout" (ctl v num chan);
+  end;
+end;
+
+mcp2ctl _ = () otherwise;

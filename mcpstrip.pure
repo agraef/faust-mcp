@@ -1,0 +1,79 @@
+
+using mcpstate;
+
+public strip sysex;
+nonfix bang;
+
+extern void pd_send(char*, expr*);
+
+showstrip strp@(strip label val num chan) =
+{foldl ($) sysex msg1, foldl ($) sysex msg2} when
+  lablst = filter (\s -> ~null s) (split "/" label);
+  lablst = if null lablst
+	   then ["",""]
+	   else if #lablst <= 1
+	   then "":lablst else lablst;
+  text1, text2 = abbrv (head lablst), abbrv (last lablst) with
+    abbrv s = pad 7 (substr s 0 7) when
+      // if we have a unit name, use that and drop anything else
+      s = if #l>1 then head l else s when l = split ":" s end;
+      // get rid of non-printables and anything which isn't 7 bit ASCII
+      s = filter (\c -> c >= " " && ord c < 128) s;
+      // algorithm pilfered from Ardour: remove whitespace and punctuation,
+      // then lower- and uppercase vowels, then consonants, in that order,
+      // until we arrive at a suitable length
+      sp = "\"\n\t ,<.>/?:;'[{}]~`!@#$%^&*()_-+=";
+      lv = "aeiou"; uv = "AEIOU";
+      lc = "bcdfghjklmnpqrtvwxyz"; uc = "BCDFGHJKLMNPQRTVWXYZ";
+      l = reverse (list s);
+      l = rm 7 (#l) sp l;
+      l = rm 7 (#l) lv l;
+      l = rm 7 (#l) uv l;
+      l = rm 7 (#l) lc l;
+      l = rm 7 (#l) uc l;
+      s = strcat (reverse l);
+    end;
+    rm n m cc xs = xs if n >= m;
+    rm n m cc [] = [];
+    rm n m cc (x:xs) = rm n (m-1) cc xs if index cc x >= 0;
+    = x : rm n m cc xs otherwise;
+    pad l s = s + strcat [" " | i = 1..l-#s];
+  end;
+  msg1 = [0, 0, 0x66,	// manufacturer id (Mackie)
+	  0x14,		// device number (0x14 == Mackie MCU)
+	  0x12,		// scribble strip
+	  7*num] +	// position
+    map ord text1;
+  msg2 = [0, 0, 0x66,	// manufacturer id (Mackie)
+	  0x14,		// device number (0x14 == Mackie MCU)
+	  0x12,		// scribble strip
+	  56+7*num] +	// position
+    map ord text2;
+end if num >= 0 && num < 8;
+
+showstrip num::int =
+{foldl ($) sysex msg1, foldl ($) sysex msg2} when
+  text = "       ";
+  msg1 = [0, 0, 0x66,	// manufacturer id (Mackie)
+	  0x14,		// device number (0x14 == Mackie MCU)
+	  0x12,		// scribble strip
+	  7*num] +	// position
+    map ord text;
+  msg2 = [0, 0, 0x66,	// manufacturer id (Mackie)
+	  0x14,		// device number (0x14 == Mackie MCU)
+	  0x12,		// scribble strip
+	  56+7*num] +	// position
+    map ord text;
+end if num >= 0 && num < 8;
+
+showstrip _ = {} otherwise;
+
+mcpstrip strp@(strip label val num chan) = msgs when
+  mcp::setstrip num strp;
+  msgs = showstrip strp;
+  pd_send "midiout" (ctl val num chan);
+end;
+
+mcpstrip bang = {showstrip (mcp::getstrip i) | i = 0..127};
+
+mcpstrip _ = () otherwise;
