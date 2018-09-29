@@ -14,10 +14,10 @@ with{
 
 	parameters(x) = vgroup("freeverb",x);
 	knobGroup(x) = parameters(vgroup("[0]",x));
-	damping = knobGroup(hslider("[0] damp",0.5, 0, 1, 0.025)*scaledamp*origSR/ma.SR);
-	combfeed = knobGroup(hslider("[1] room size", 0.5, 0, 1, 0.025)*scaleroom*origSR/ma.SR + offsetroom);
-	spatSpread = knobGroup(hslider("[2] stereo spread",0.5,0,1,0.01)*46*ma.SR/origSR : int);
-	g = parameters(hslider("[1] wet", 0.3333, 0, 1, 0.025));
+	damping = knobGroup(hslider("[0] damp [midi:ctrl 13]",0.5, 0, 1, 0.025)*scaledamp*origSR/ma.SR);
+	combfeed = knobGroup(hslider("[1] room size [midi:ctrl 14]", 0.5, 0, 1, 0.025)*scaleroom*origSR/ma.SR + offsetroom);
+	spatSpread = knobGroup(hslider("[2] stereo spread [midi:ctrl 15]",0.5,0,1,0.01)*46*ma.SR/origSR : int);
+	g = parameters(hslider("[1] wet [midi:ctrl 16]", 0.3333, 0, 1, 0.025));
 };
 
 process = freeverb;
