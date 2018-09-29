@@ -1,7 +1,16 @@
 
-public strip;
+public ctl bend strip sysex;
+nonfix bang write clear;
+
+extern void pd_send(char*, expr*);
+extern void pd_post(char*);
 
 namespace mcp;
+
+let offs = ref 0;
+
+getoffs = get offs;
+setoffs num = put offs num;
 
 let ccval = { ref 0 | i = 0..127 };
 let ccmap = { ref i | i = 0..127 };
@@ -14,8 +23,15 @@ getval num = get (ccval!int num) if num>=0 && num<=127;
 setval num val = put (ccval!int num) val if num>=0 && num<=127;
 = () otherwise;
 
-getstripnum num = get (ccmap!int num);
-getccnum num = get (ccrmap!int num);
+getstripnum num = shiftnum (get (ccmap!int num)) with
+  shiftnum num = -1 if num < 0 || num < get offs;
+  = num-get offs otherwise;
+end;
+
+getccnum num = num when
+  num = int num+get offs;
+  num = if num < 0 || num >= 128 then -1 else get (ccrmap!num);
+end;
 
 getstrip num = get (ccstrip!int num) if num>=0 && num<=127;
 = () otherwise;
@@ -37,3 +53,5 @@ setstrip num strip = () when
   update_map;
 end if num>=0 && num<=127;
 = () otherwise;
+
+getnumstrips = #filter ((>=0).get) ccmap;

@@ -1,9 +1,37 @@
 
 using mcpstate;
 
-public ctl bend;
-
-extern void pd_send(char*, expr*);
+mcp2ctl (note num val chan) = case int num of
+  46 = if bank_left then out else ();
+  47 = if bank_right then out else ();
+  48 = if channel_left then out else ();
+  49 = if channel_right then out else ();
+  _ = ();
+end if chan >= 17 && val > 0 with
+  bank_left = mcp::setoffs num $$ true if num >= 0 when
+    num = 8*(mcp::getoffs div 8);
+    num = if num < mcp::getoffs then num else num-8;
+  end;
+  = false otherwise;
+  bank_right = mcp::setoffs num $$ true if num < mcp::getnumstrips when
+    num = 8*(mcp::getoffs div 8+1);
+  end;
+  = false otherwise;
+  channel_left = mcp::setoffs num $$ true if num >= 0 when
+    num = mcp::getoffs-1;
+  end;
+  = false otherwise;
+  channel_right = mcp::setoffs num $$ true if num < mcp::getnumstrips when
+    num = mcp::getoffs+1;
+  end;
+  = false otherwise;
+  out = () when
+    pd_send "midistrip" bang;
+    ctls = [mcp::getccnum i | i = 0..7];
+    ctls = [ctl (mcp::getval num) num 1 | num = ctls; num >= 0];
+    do (pd_send "midiout") ctls;
+  end;
+end;
 
 mcp2ctl (bend val chan) = convert (bend val (chan-16)) if chan >= 17 with
   convert (bend val chan) = ctl v num 1 when

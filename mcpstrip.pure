@@ -1,60 +1,6 @@
 
 using mcpstate;
 
-public strip sysex;
-nonfix bang clear;
-
-extern void pd_send(char*, expr*);
-
-showstrip strp@(strip label val num chan) =
-{foldl ($) sysex msg1, foldl ($) sysex msg2} when
-  lablst = filter (\s -> ~null s) (split "/" label);
-  lablst = if null lablst
-	   then ["",""]
-	   else if #lablst <= 1
-	   then "":lablst else lablst;
-  text1, text2 = abbrv (head lablst), abbrv (last lablst) with
-    abbrv s = pad 7 (substr s 0 7) when
-      // if we have a unit name, use that and drop anything else
-      s = if #l>1 then head l else s when l = split ":" s end;
-      // get rid of non-printables and anything which isn't 7 bit ASCII
-      s = filter (\c -> c >= " " && ord c < 128) s;
-      // algorithm pilfered from Ardour: remove whitespace and punctuation,
-      // then lower- and uppercase vowels, then consonants, in that order,
-      // until we arrive at a suitable length
-      sp = "\"\n\t ,<.>/?:;'[{}]~`!@#$%^&*()_-+=";
-      lv = "aeiou"; uv = "AEIOU";
-      lc = "bcdfghjklmnpqrtvwxyz"; uc = "BCDFGHJKLMNPQRTVWXYZ";
-      l = reverse (list s);
-      l = rm 7 (#l) sp l;
-      l = rm 7 (#l) lv l;
-      l = rm 7 (#l) uv l;
-      l = rm 7 (#l) lc l;
-      l = rm 7 (#l) uc l;
-      s = strcat (reverse l);
-    end;
-    rm n m cc xs = xs if n >= m;
-    rm n m cc [] = [];
-    rm n m cc (x:xs) = rm n (m-1) cc xs if index cc x >= 0;
-    = x : rm n m cc xs otherwise;
-    pad l s = s + strcat [" " | i = 1..l-#s];
-  end;
-  msg1 = [0, 0, 0x66,	// manufacturer id (Mackie)
-	  0x14,		// device number (0x14 == Mackie MCU)
-	  0x12,		// scribble strip
-	  7*num] +	// position
-    map ord text1;
-  msg2 = [0, 0, 0x66,	// manufacturer id (Mackie)
-	  0x14,		// device number (0x14 == Mackie MCU)
-	  0x12,		// scribble strip
-	  56+7*num] +	// position
-    map ord text2;
-end if num >= 0 && num < 8 when
-  num = mcp::getstripnum num;
-end;
-
-showstrip _ = {} otherwise;
-
 clearstrip num::int =
 {foldl ($) sysex msg1, foldl ($) sysex msg2} when
   text = "       ";
@@ -68,20 +14,65 @@ clearstrip num::int =
 	  0x12,		// scribble strip
 	  56+7*num] +	// position
     map ord text;
-end if num >= 0 && num < 8;
+end if num >= 0 && num <= 7;
+
+showstrip num = case mcp::getstrip (mcp::getccnum num) of
+  strip label val _ chan = {foldl ($) sysex msg1, foldl ($) sysex msg2} when
+    lablst = filter (\s -> ~null s) (split "/" label);
+    lablst = if null lablst
+	     then ["",""]
+	     else if #lablst <= 1
+	     then "":lablst else lablst;
+    text1, text2 = abbrv (head lablst), abbrv (last lablst) with
+      abbrv s = pad 7 (substr s 0 7) when
+	// if we have a unit name, use that and drop anything else
+	s = if #l>1 then head l else s when l = split ":" s end;
+	// get rid of non-printables and anything which isn't 7 bit ASCII
+	s = filter (\c -> c >= " " && ord c < 128) s;
+	// algorithm pilfered from Ardour: remove whitespace and punctuation,
+	// then lower- and uppercase vowels, then consonants, in that order,
+	// until we arrive at a suitable length
+	sp = "\"\n\t ,<.>/?:;'[{}]~`!@#$%^&*()_-+=";
+	lv = "aeiou"; uv = "AEIOU";
+	lc = "bcdfghjklmnpqrtvwxyz"; uc = "BCDFGHJKLMNPQRTVWXYZ";
+	l = reverse (list s);
+	l = rm 7 (#l) sp l;
+	l = rm 7 (#l) lv l;
+	l = rm 7 (#l) uv l;
+	l = rm 7 (#l) lc l;
+	l = rm 7 (#l) uc l;
+	s = strcat (reverse l);
+      end;
+      rm n m cc xs = xs if n >= m;
+      rm n m cc [] = [];
+      rm n m cc (x:xs) = rm n (m-1) cc xs if index cc x >= 0;
+      = x : rm n m cc xs otherwise;
+      pad l s = s + strcat [" " | i = 1..l-#s];
+    end;
+    msg1 = [0, 0, 0x66,	// manufacturer id (Mackie)
+	    0x14,	// device number (0x14 == Mackie MCU)
+	    0x12,	// scribble strip
+	    7*num] +	// position
+      map ord text1;
+    msg2 = [0, 0, 0x66,	// manufacturer id (Mackie)
+	    0x14,	// device number (0x14 == Mackie MCU)
+	    0x12,	// scribble strip
+	    56+7*num] +	// position
+      map ord text2;
+  end;
+  _ = clearstrip num otherwise;
+end if num >= 0 && num <= 7;
+
+showstrip _ = {} otherwise;
 
 mcpstrip strp@(strip label val num chan) = msgs when
   mcp::setstrip num strp;
-  msgs = showstrip strp;
+  msgs = showstrip (mcp::getstripnum num);
   //pd_send "midiout" (ctl val num chan);
 end;
 
 mcpstrip clear = {clearstrip i | i = 0..7};
 
-mcpstrip bang = {show i | i = 0..7} with
-  show num = showstrip (mcp::getstrip num)
-    if mcp::getccnum num >= 0;
-  show num = clearstrip num otherwise;
-end;
+mcpstrip bang  = {showstrip i | i = 0..7};
 
 mcpstrip _ = () otherwise;
