@@ -16,14 +16,35 @@ clearstrip num::int =
     map ord text;
 end if num >= 0 && num <= 7;
 
+/* Map the value of continuous controllers for display in the scribble strips.
+   This is the same function that's being used in pd-faust itself. The problem
+   here is that the range 0..127 is not symmetric. We'd like to map 64 to the
+   center of the range (max-min)/2 and at the same time retain the full
+   control range min..max. So let's just pretend that there are 128 controller
+   values and map value 127 to the max value anyway. */
+
+stripval min max step val =
+  if val==127 then double max
+  else round_step step (min+(max-min)*val/128) with
+    // round to the nearest step size
+    round_step step x = if step~=0 then round (x/step)*step else x;
+  end;
+
 showstrip num = case mcp::getstrip (mcp::getccnum num) of
-  strip label val _ chan = {foldl ($) sysex msg1, foldl ($) sysex msg2} when
+  strip label min max step _ ccnum chan =
+  {foldl ($) sysex msg1, foldl ($) sysex msg2} when
+    val = mcp::getval ccnum;
     lablst = filter (\s -> ~null s) (split "/" label);
     lablst = if null lablst
 	     then ["",""]
 	     else if #lablst <= 1
 	     then "":lablst else lablst;
-    text1, text2 = abbrv (head lablst), abbrv (last lablst) with
+    text1, text2 =
+      (if mcp::getview
+       then sprintf "%7g" (stripval min max step val)
+       else abbrv (head lablst)),
+      abbrv (last lablst)
+    with
       abbrv s = pad 7 (substr s 0 7) when
 	// if we have a unit name, use that and drop anything else
 	s = if #l>1 then head l else s when l = split ":" s end;
@@ -65,11 +86,27 @@ end if num >= 0 && num <= 7;
 
 showstrip _ = {} otherwise;
 
-mcpstrip strp@(strip label val num chan) = msgs when
+showval num flag = case mcp::getstrip (mcp::getccnum num) of
+  strip label min max step _ ccnum chan = foldl ($) sysex msg when
+    val = mcp::getval ccnum;
+    msg = [0, 0, 0x66,	// manufacturer id (Mackie)
+	   0x14,	// device number (0x14 == Mackie MCU)
+	   0x12,	// scribble strip
+	   7*num] +	// position
+      map ord (sprintf "%7g" (stripval min max step val));
+    mcp::setview true;
+  end if flag > 0;
+  _ = mcp::setview false $$ showstrip num otherwise;
+end if num >= 0 && num <= 7;
+
+mcpstrip strp@(strip label min max step val num chan) = msgs when
   mcp::setstrip num strp;
   msgs = showstrip (mcp::getstripnum num);
   //pd_send "midiout" (ctl val num chan);
 end;
+
+mcpstrip (view num flag) = showval num flag if flag > 0 && mcp::getview;
+= mcp::setview (flag>0) $$ mcpstrip bang otherwise;
 
 mcpstrip clear = {clearstrip i | i = 0..7};
 

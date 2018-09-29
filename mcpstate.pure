@@ -1,6 +1,8 @@
 
-public ctl bend strip sysex;
+public ctl bend strip view sysex;
 nonfix bang write clear;
+
+using system;
 
 extern void pd_send(char*, expr*);
 extern void pd_post(char*);
@@ -11,6 +13,11 @@ let offs = ref 0;
 
 getoffs = get offs;
 setoffs num = put offs num;
+
+let view = ref false;
+
+getview = get view;
+setview num = put view num;
 
 let ccval = { ref 0 | i = 0..127 };
 let ccmap = { ref i | i = 0..127 };
@@ -36,12 +43,12 @@ end;
 getstrip num = get (ccstrip!int num) if num>=0 && num<=127;
 = () otherwise;
 
-isstrip (strip _ _ _ _) = true;
+isstrip (strip _ _ _ _ _ _ _) = true;
 isstrip _ = false otherwise;
 
 update_map = () when
   strips = list $ filter isstrip $ map get ccstrip;
-  m = { i,int j | i,strip _ _ j _ = zip (0..#strips-1) strips };
+  m = { i,int j | i,strip _ _ _ _ _ j _ = zip (0..#strips-1) strips };
   do (flip put (-1)) ccmap;
   do (flip put (-1)) ccrmap;
   do (\(i,j) -> put (ccmap!j) i) m;

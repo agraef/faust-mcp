@@ -8,6 +8,7 @@ ctl2mcp (ctl val num chan) = convert (ctl val num chan) with
   when
     mcp::setval num val;
     num = mcp::getstripnum num;
+    mcp::getview && pd_send "midistrip" (view num 1);
   end;
 end;
 
