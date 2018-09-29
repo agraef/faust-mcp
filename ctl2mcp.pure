@@ -2,7 +2,7 @@
 using mcpstate;
 
 ctl2mcp (ctl val num chan) = convert (ctl val num chan) with
-  convert (ctl val num chan) = () if chan ~= 1;
+  convert (ctl val num chan) //= () if chan ~= 1;
   = {ctl (val/12.7+1) (num+48) 1, bend (val*129-8192) (num+1)}
   if num >= 0
   when
