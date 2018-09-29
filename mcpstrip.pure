@@ -2,7 +2,7 @@
 using mcpstate;
 
 public strip sysex;
-nonfix bang;
+nonfix bang clear;
 
 extern void pd_send(char*, expr*);
 
@@ -49,9 +49,13 @@ showstrip strp@(strip label val num chan) =
 	  0x12,		// scribble strip
 	  56+7*num] +	// position
     map ord text2;
-end if num >= 0 && num < 8;
+end if num >= 0 && num < 8 when
+  num = mcp::getstripnum num;
+end;
 
-showstrip num::int =
+showstrip _ = {} otherwise;
+
+clearstrip num::int =
 {foldl ($) sysex msg1, foldl ($) sysex msg2} when
   text = "       ";
   msg1 = [0, 0, 0x66,	// manufacturer id (Mackie)
@@ -66,14 +70,18 @@ showstrip num::int =
     map ord text;
 end if num >= 0 && num < 8;
 
-showstrip _ = {} otherwise;
-
 mcpstrip strp@(strip label val num chan) = msgs when
   mcp::setstrip num strp;
   msgs = showstrip strp;
-  pd_send "midiout" (ctl val num chan);
+  //pd_send "midiout" (ctl val num chan);
 end;
 
-mcpstrip bang = {showstrip (mcp::getstrip i) | i = 0..127};
+mcpstrip clear = {clearstrip i | i = 0..7};
+
+mcpstrip bang = {show i | i = 0..7} with
+  show num = showstrip (mcp::getstrip num)
+    if mcp::getccnum num >= 0;
+  show num = clearstrip num otherwise;
+end;
 
 mcpstrip _ = () otherwise;

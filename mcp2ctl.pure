@@ -8,14 +8,15 @@ extern void pd_send(char*, expr*);
 mcp2ctl (bend val chan) = convert (bend val (chan-16)) if chan >= 17 with
   convert (bend val chan) = ctl v num 1 when
     v = (val+8192)/128;
-    num = chan-1;
     pd_send "midiout" (ctl v num 1);
+  end if num >= 0 when
+    num = mcp::getccnum (chan-1);
   end;
 end;
 
 mcp2ctl (ctl val num chan) = convert (ctl val num (chan-16)) if chan >= 17 with
-  convert (ctl val num chan) = ctl (change num val chan) num 1 when
-    num = num-16;
+  convert (ctl val num chan) = ctl (change num val chan) num 1 if num >= 0 when
+    num = mcp::getccnum (num-16);
   end;
   change num val chan = v when
     // sign-bit encoder value

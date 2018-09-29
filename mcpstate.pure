@@ -1,7 +1,11 @@
 
+public strip;
+
 namespace mcp;
 
 let ccval = { ref 0 | i = 0..127 };
+let ccmap = { ref i | i = 0..127 };
+let ccrmap = { ref i | i = 0..127 };
 let ccstrip = { ref i | i = 0..127 };
 
 getval num = get (ccval!int num) if num>=0 && num<=127;
@@ -10,8 +14,26 @@ getval num = get (ccval!int num) if num>=0 && num<=127;
 setval num val = put (ccval!int num) val if num>=0 && num<=127;
 = () otherwise;
 
+getstripnum num = get (ccmap!int num);
+getccnum num = get (ccrmap!int num);
+
 getstrip num = get (ccstrip!int num) if num>=0 && num<=127;
 = () otherwise;
 
-setstrip num strip = put (ccstrip!int num) strip if num>=0 && num<=127;
+isstrip (strip _ _ _ _) = true;
+isstrip _ = false otherwise;
+
+update_map = () when
+  strips = list $ filter isstrip $ map get ccstrip;
+  m = { i,int j | i,strip _ _ j _ = zip (0..#strips-1) strips };
+  do (flip put (-1)) ccmap;
+  do (flip put (-1)) ccrmap;
+  do (\(i,j) -> put (ccmap!j) i) m;
+  do (\(i,j) -> put (ccrmap!i) j) m;
+end;
+
+setstrip num strip = () when
+  put (ccstrip!int num) strip;
+  update_map;
+end if num>=0 && num<=127;
 = () otherwise;
