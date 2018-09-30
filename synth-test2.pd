@@ -1,4 +1,4 @@
-#N canvas 413 276 737 400 10;
+#N canvas 372 242 743 409 10;
 #X obj 134 305 dac~;
 #N canvas 852 209 450 300 synth 0;
 #X obj 10 30 hsl 128 15 0 1 0 0 synth:subtractive/attack synth:subtractive/attack
@@ -28,9 +28,9 @@ synth:subtractive/cutoff-harmonic cutoff-harmonic -2 -6 0 10 -262144
 synth:subtractive/cutoff-harmonic empty 0 -6 0 10 -262144 -1 -1 6 256
 0;
 #X obj 10 210 hsl 128 15 0 1 0 0 synth:subtractive/vol synth:subtractive/vol
-vol -2 -6 0 10 -262144 -1 -1 9906 1;
+vol -2 -6 0 10 -262144 -1 -1 3810 1;
 #X obj 160 210 nbx 5 14 0 1 0 0 synth:subtractive/vol synth:subtractive/vol
-empty 0 -6 0 10 -262144 -1 -1 0.78 256 0;
+empty 0 -6 0 10 -262144 -1 -1 0.3 256 0;
 #X obj 10 240 hsl 128 15 0 1 0 0 synth:subtractive/pan synth:subtractive/pan
 pan -2 -6 0 10 -262144 -1 -1 6350 1;
 #X obj 160 240 nbx 5 14 0 1 0 0 synth:subtractive/pan synth:subtractive/pan
@@ -97,38 +97,36 @@ wet -2 -6 0 10 -262144 -1 -1 4233 1;
 #X coords 0 -1 1 1 235 150 1 0 0;
 #X restore 482 174 pd fx2;
 #X obj 14 252 faust~ chorus fx1, f 24;
-#X obj 14 276 faust~ freeverb fx2, f 24;
-#X obj 234 306 mcp;
-#X obj 234 352 s midiin;
-#X obj 14 206 r midiin;
+#X obj 236 306 mcp;
+#X obj 236 352 s faustdsp;
 #N canvas 766 265 451 324 midiin 0;
-#X obj 135 21 midi-input;
-#X obj 135 44 midifilter (<17);
-#X obj 135 66 t a a;
-#X obj 135 88 s midiin;
-#X obj 162 110 s midiout;
-#X obj 22 21 loadbang;
-#X msg 22 43 write \, write 1 \; pd dsp 1;
-#X obj 259 21 r player;
+#X obj 25 21 midi-input;
+#X obj 25 44 midifilter (<17);
+#X obj 25 66 t a a;
+#X obj 25 88 s faustdsp;
+#X obj 52 110 s midiout;
+#X obj 149 21 r player;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;
 #X connect 2 1 4 0;
-#X connect 5 0 6 0;
-#X connect 6 0 3 0;
-#X connect 7 0 2 0;
+#X connect 5 0 2 0;
 #X restore 322 352 pd midiin;
-#X obj 12 20 midiosc "bwv772.mid";
-#X obj 12 125 s player;
+#X obj 12 18 midiosc "bwv772.mid";
+#X obj 12 123 s player;
+#X obj 14 276 faust~ freeverb fx2, f 24;
+#X obj 15 166 bng 15 250 50 0 empty empty print\ controls 17 7 0 10
+-262144 -1 -1;
+#X obj 15 186 s faustdsp;
 #X connect 3 0 4 0;
 #X connect 3 1 7 1;
 #X connect 3 2 7 2;
-#X connect 7 1 8 1;
-#X connect 7 2 8 2;
-#X connect 8 1 0 0;
-#X connect 8 2 0 1;
-#X connect 9 0 10 0;
-#X connect 11 0 3 0;
-#X connect 11 0 8 0;
-#X connect 11 0 7 0;
-#X connect 13 0 14 0;
+#X connect 7 0 4 0;
+#X connect 7 1 13 1;
+#X connect 7 2 13 2;
+#X connect 8 0 9 0;
+#X connect 11 0 12 0;
+#X connect 13 0 4 0;
+#X connect 13 1 0 0;
+#X connect 13 2 0 1;
+#X connect 14 0 15 0;

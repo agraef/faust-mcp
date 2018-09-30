@@ -60,7 +60,7 @@ showstrip num = case mcp::getstrip (mcp::getccnum num) of
 	     else if #lablst <= 1 then "":lablst
 	     else lablst;
     text1  = if mcp::getview
-	     then sprintf "%7g" (stripval min max step val)
+	     then take 7 (sprintf "%7g" (stripval min max step val))
 	     else abbrv (t (head lablst)) with
 	       // select the unit name part if present
 	       t s = if #l>1 then p l else s when l = split ":" s end;
@@ -77,24 +77,28 @@ showstrip _ = {} otherwise;
 showval num flag = case mcp::getstrip (mcp::getccnum num) of
   strip label min max step _ ccnum chan = stripmsg 0 num text when
     val = mcp::getval ccnum;
-    text = sprintf "%7g" (stripval min max step val);
-    mcp::setview true;
+    text = take 7 (sprintf "%7g" (stripval min max step val));
+    mcp::getview || mcp::setview (int flag);
   end if flag > 0;
-  _ = mcp::setview false $$ showstrip num otherwise;
+  _ = () otherwise;
 end if num >= 0 && num <= 7;
 
 mcpstrip strp@(strip label min max step val num chan) = msgs when
   mcp::setstrip num strp;
-  msgs = showstrip (mcp::getstripnum num);
+  // Set a timer for this message, to prevent cascades of bang messages when a
+  // bunch of strips are updated in quick succession.
+  msgs = pd_delay 500 bang;
   //pd_send "midiout" (ctl val num chan);
 end;
 
 mcpstrip (view num flag) = showval num flag if flag > 0 && mcp::getview;
-= mcp::setview (flag>0) $$ mcpstrip bang otherwise;
+= mcp::setview (int flag) $$ mcpstrip bang otherwise;
 
 mcpstrip clear = {clearstrip i | i = 0..7};
 
 mcpstrip bang  = {showstrip i | i = 0..7};
+
+mcpstrip reload = mcp::reinit;
 
 mcpstrip flag::number = mcp::settoggle (flag > 0) $$ mcpstrip bang;
 

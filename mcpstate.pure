@@ -1,6 +1,6 @@
 
-public ctl bend strip view sysex;
-nonfix bang write clear;
+public ctl bend strip view sysex pd_delay;
+nonfix bang write clear reload;
 
 using system;
 
@@ -29,6 +29,15 @@ let ccmap = { ref i | i = 0..127 };
 let ccrmap = { ref i | i = 0..127 };
 let ccstrip = { ref i | i = 0..127 };
 
+reinit = () when
+  put offs false;
+  //put view false;
+  do (flip put 0) ccval;
+  dowith (\r v -> put r v) ccmap (vector (0..127));
+  dowith (\r v -> put r v) ccrmap (vector (0..127));
+  dowith (\r v -> put r v) ccstrip (vector (0..127));
+end;
+
 getval num = get (ccval!int num) if num>=0 && num<=127;
 = 0 otherwise;
 
@@ -48,6 +57,10 @@ end;
 getstrip num = get (ccstrip!int num) if num>=0 && num<=127;
 = () otherwise;
 
+isstrip num::number = case getstrip num of
+  strip label min max step val num chan = true;
+  _ = false;
+end;
 isstrip (strip _ _ _ _ _ _ _) = true;
 isstrip _ = false otherwise;
 
@@ -67,3 +80,13 @@ end if num>=0 && num<=127;
 = () otherwise;
 
 getnumstrips = #filter ((>=0).get) ccmap;
+
+getccchan num = case getstrip num of
+  strip label min max step val num chan = chan;
+  _ = 1;
+end;
+
+passive num = case getstrip num of
+  strip label min max step val num chan = step==0;
+  _ = 0;
+end;

@@ -1,4 +1,4 @@
-#N canvas 400 316 710 396 10;
+#N canvas 330 260 713 401 10;
 #X obj 77 112 midi-input;
 #X obj 134 305 dac~;
 #N canvas 852 209 450 300 synth 0;
@@ -29,13 +29,13 @@ synth:subtractive/cutoff-harmonic cutoff-harmonic -2 -6 0 10 -262144
 synth:subtractive/cutoff-harmonic empty 0 -6 0 10 -262144 -1 -1 6 256
 0;
 #X obj 10 210 hsl 128 15 0 1 0 0 synth:subtractive/vol synth:subtractive/vol
-vol -2 -6 0 10 -262144 -1 -1 9906 1;
+vol -2 -6 0 10 -262144 -1 -1 3810 1;
 #X obj 160 210 nbx 5 14 0 1 0 0 synth:subtractive/vol synth:subtractive/vol
-empty 0 -6 0 10 -262144 -1 -1 0.78 256 0;
+empty 0 -6 0 10 -262144 -1 -1 0.3 256 0;
 #X obj 10 240 hsl 128 15 0 1 0 0 synth:subtractive/pan synth:subtractive/pan
-pan -2 -6 0 10 -262144 -1 -1 6350 1;
+pan -2 -6 0 10 -262144 -1 -1 4700 1;
 #X obj 160 240 nbx 5 14 0 1 0 0 synth:subtractive/pan synth:subtractive/pan
-empty 0 -6 0 10 -262144 -1 -1 0.5 256 0;
+empty 0 -6 0 10 -262144 -1 -1 0.370079 256 0;
 #X obj 177 3 tgl 15 1 synth:record synth:record empty 0 -6 0 10 -233017
 -1 -1 0 1;
 #X obj 197 3 bng 15 250 50 1 synth:init synth:init empty 0 -6 0 10
@@ -45,7 +45,7 @@ empty 0 -6 0 10 -262144 -1 -1 0.5 256 0;
 #X coords 0 -1 1 1 235 270 1 0 0;
 #X restore 196 18 pd synth;
 #X obj 14 64 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 0 1;
+-1 -1 4700 1;
 #X obj 14 41 / 127;
 #X obj 359 310 loadbang;
 #X obj 14 339 faust-remote;
@@ -104,33 +104,34 @@ wet -2 -6 0 10 -262144 -1 -1 4233 1;
 #X restore 442 174 pd fx2;
 #X obj 14 252 faust~ chorus fx1, f 24;
 #X obj 14 276 faust~ freeverb fx2, f 24;
-#X obj 194 306 mcp;
-#X obj 194 352 s midiin;
-#X obj 14 147 r midiin;
+#X obj 196 306 mcp;
+#X obj 196 352 s faustdsp;
 #X obj 77 134 midifilter (<17);
 #X obj 14 18 ctlin 8 1;
 #X msg 359 332 write \, write 1 \; pd dsp 1;
 #X obj 77 156 t a a;
-#X obj 77 178 s midiin;
+#X obj 77 178 s faustdsp;
 #X obj 104 200 s midiout;
-#X connect 0 0 17 0;
+#X obj 48 157 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X connect 0 0 16 0;
 #X connect 3 0 9 0;
 #X connect 4 0 3 0;
-#X connect 5 0 19 0;
+#X connect 5 0 18 0;
 #X connect 7 0 8 0;
 #X connect 7 1 12 1;
 #X connect 7 2 12 2;
 #X connect 9 0 7 0;
+#X connect 12 0 8 0;
 #X connect 12 1 13 1;
 #X connect 12 2 13 2;
+#X connect 13 0 8 0;
 #X connect 13 1 1 0;
 #X connect 13 2 1 1;
 #X connect 14 0 15 0;
-#X connect 16 0 7 0;
-#X connect 16 0 13 0;
-#X connect 16 0 12 0;
-#X connect 17 0 20 0;
-#X connect 18 0 4 0;
-#X connect 19 0 15 0;
-#X connect 20 0 21 0;
-#X connect 20 1 22 0;
+#X connect 16 0 19 0;
+#X connect 17 0 4 0;
+#X connect 18 0 15 0;
+#X connect 19 0 20 0;
+#X connect 19 1 21 0;
+#X connect 22 0 20 0;
