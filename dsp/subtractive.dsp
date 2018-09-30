@@ -14,13 +14,13 @@ with {
 };
 
 // control variables
-attack	= hslider("[1] attack [midi:ctrl 1]", 0.01, 0, 1, 0.001); // sec
-decay	= hslider("[2] decay [midi:ctrl 2]", 0.3, 0, 1, 0.001);	  // sec
-sustain = hslider("[3] sustain [midi:ctrl 3]", 0.5, 0, 1, 0.01);  // %
-release = hslider("[4] release [midi:ctrl 4]", 0.2, 0, 1, 0.001); // sec
+attack	= hslider("[1] attack [midi:ctrl 16]", 0.01, 0, 1, 0.001); // sec
+decay	= hslider("[2] decay [midi:ctrl 17]", 0.3, 0, 1, 0.001);	  // sec
+sustain = hslider("[3] sustain [midi:ctrl 18]", 0.5, 0, 1, 0.01);  // %
+release = hslider("[4] release [midi:ctrl 19]", 0.2, 0, 1, 0.001); // sec
 
-res	= hslider("[5] resonance (dB) [midi:ctrl 5]", 3, 0, 20, 0.1);
-cutoff	= hslider("[6] cutoff (harmonic) [midi:ctrl 6]", 6, 1, 20, 0.1);
+res	= hslider("[5] resonance (dB) [midi:ctrl 20]", 3, 0, 20, 0.1);
+cutoff	= hslider("[6] cutoff (harmonic) [midi:ctrl 21]", 6, 1, 20, 0.1);
 
 vol	= hslider("[7] vol [midi:ctrl 7]", 0.3, 0, 1, 0.01);	// %
 pan	= hslider("[8] pan [midi:ctrl 8]", 0.5, 0, 1, 0.01);	// %
