@@ -4,12 +4,18 @@ using mcpstate;
 ctl2mcp (ctl val num chan) = convert (ctl val num chan) with
   convert (ctl val num chan) //= () if chan ~= 1;
   = {ctl (val/12.7+1) (num+48) 1, bend (val*129-8192) (num+1)}
-  if num >= 0
+  if num >= 0 && num <= 7
   when
     mcp::setval num val;
     num = mcp::getstripnum num;
     mcp::getview && pd_send "midistrip" (view num 1);
   end;
+end;
+
+ctl2mcp bang = ctls when
+  ctls = {mcp::getccnum i | i = 0..7};
+  ctls = {ctl2mcp (ctl (mcp::getval num) num (getccchan num)) |
+	  num = ctls; num >= 0};
 end;
 
 ctl2mcp msg = () otherwise;

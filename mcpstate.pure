@@ -14,6 +14,11 @@ let offs = ref 0;
 getoffs = get offs;
 setoffs num = put offs num;
 
+let toggle = ref false;
+
+gettoggle = get toggle;
+settoggle num = put toggle num;
+
 let view = ref false;
 
 getview = get view;
