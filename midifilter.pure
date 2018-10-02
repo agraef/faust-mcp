@@ -1,8 +1,7 @@
 
-// Little helper external to filter MIDI messages in the SMMF format.
-// Takes a single creation argument, either a MIDI channel number, or a number
-// predicate which determines the messages to be passed through.
-
-midifilter n::number msg@(_ m) = if n==m then msg else ();
-midifilter p msg@(_ m) = if ok then msg else () f if numberp ok
-when ok = p m end;
+midifilter p::number msg@[_,ch] |
+midifilter p::number msg@[_,_,ch] |
+midifilter p::number msg@(_ ch) =
+  if (int ch-1) div 16 == p-1 then msg else () when
+    p = max 1 (int p);
+  end;
