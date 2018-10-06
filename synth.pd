@@ -1,4 +1,4 @@
-#N canvas 386 222 744 445 10;
+#N canvas 390 250 745 446 10;
 #X obj 134 305 dac~;
 #N canvas 852 209 450 300 synth 0;
 #X obj 10 30 hsl 128 15 0 1 0 0 synth:subtractive/attack synth:subtractive/attack
@@ -28,9 +28,9 @@ synth:subtractive/cutoff-harmonic cutoff-harmonic -2 -6 0 10 -262144
 synth:subtractive/cutoff-harmonic empty 0 -6 0 10 -262144 -1 -1 6 256
 0;
 #X obj 10 210 hsl 128 15 0 1 0 0 synth:subtractive/vol synth:subtractive/vol
-vol -2 -6 0 10 -262144 -1 -1 8890 1;
+vol -2 -6 0 10 -262144 -1 -1 3810 1;
 #X obj 160 210 nbx 5 14 0 1 0 0 synth:subtractive/vol synth:subtractive/vol
-empty 0 -6 0 10 -262144 -1 -1 0.7 256 0;
+empty 0 -6 0 10 -262144 -1 -1 0.3 256 0;
 #X obj 10 240 hsl 128 15 0 1 0 0 synth:subtractive/pan synth:subtractive/pan
 pan -2 -6 0 10 -262144 -1 -1 6350 1;
 #X obj 160 240 nbx 5 14 0 1 0 0 synth:subtractive/pan synth:subtractive/pan
@@ -99,34 +99,39 @@ wet -2 -6 0 10 -262144 -1 -1 4233 1;
 #X obj 14 252 faust~ chorus fx1, f 24;
 #X obj 236 333 mcp 2;
 #X obj 236 409 s faustdsp;
-#N canvas 766 265 451 324 midiin 0;
-#X obj 25 21 midi-input;
-#X obj 25 44 midifilter 1;
-#X obj 25 66 t a a;
-#X obj 25 88 s faustdsp;
-#X obj 52 110 s midiout;
-#X obj 149 21 r player;
-#X connect 0 0 1 0;
-#X connect 1 0 2 0;
-#X connect 2 0 3 0;
-#X connect 2 1 4 0;
-#X connect 5 0 2 0;
-#X restore 322 409 pd midiin;
 #X obj 12 18 midiosc "bwv772.mid";
 #X obj 12 123 s player;
 #X obj 14 276 faust~ freeverb fx2, f 24;
 #X obj 15 166 bng 15 250 50 0 empty empty print\ controls 17 7 0 10
 -262144 -1 -1;
 #X obj 15 186 s faustdsp;
+#N canvas 766 265 451 324 midi-input 0;
+#X obj 25 68 midifilter 1;
+#X obj 25 90 t a a;
+#X obj 25 112 s faustdsp;
+#X obj 52 134 s midiout;
+#X obj 25 21 r player;
+#X obj 25 45 mcp/midi-input;
+#X text 129 21 input from midiosc player;
+#X text 129 45 Pd MIDI input;
+#X text 129 68 use only MIDI input from port 1;
+#X text 129 113 send all MIDI input to the faust dsps;
+#X text 129 134 also send controller data to mcp;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 1 1 3 0;
+#X connect 4 0 1 0;
+#X connect 5 0 0 0;
+#X restore 99 123 pd midi-input;
 #X connect 3 0 4 0;
 #X connect 3 1 7 1;
 #X connect 3 2 7 2;
 #X connect 7 0 4 0;
-#X connect 7 1 13 1;
-#X connect 7 2 13 2;
+#X connect 7 1 12 1;
+#X connect 7 2 12 2;
 #X connect 8 0 9 0;
-#X connect 11 0 12 0;
-#X connect 13 0 4 0;
-#X connect 13 1 0 0;
-#X connect 13 2 0 1;
-#X connect 14 0 15 0;
+#X connect 10 0 11 0;
+#X connect 12 0 4 0;
+#X connect 12 1 0 0;
+#X connect 12 2 0 1;
+#X connect 13 0 14 0;
