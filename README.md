@@ -1,25 +1,50 @@
 
 # faust-mcp
 
-This package provides an abstraction mcp.pd (along with some helper abstractions and Pure externals) which interfaces pd-faust to Mackie MCU devices and compatible equipment such as Behringer's X-Touch (which was the actual device used for testing). Some examples showing its use are provided, as well as a suitably modified version of pd-faust's midiosc player, and some Faust dsp examples and MIDI files in the dsp and midi subdirectories.
+This package provides an abstraction mcp.pd (along with some helper abstractions and Pure externals) which interfaces [pd-faust][] to Mackie MCU devices and compatible equipment such as Behringer's X-Touch (which was the actual device used for testing).
 
-NOTE: This package requires the latest versions of pd-pure and pd-faust, which are part of the Pure programming system. Packages for Linux systems (Arch and Ubuntu) are available, please see https://agraef.github.io/pure-lang/ for details.
+To use the abstraction, you'll need to have the latest versions of [pd-pure][] and [pd-faust][] installed and enabled in Pd. These extensions are part of the Pure programming system. Ready-made packages are available for Linux (Arch and Ubuntu), Mac and Windows, please see https://agraef.github.io/pure-lang/ for details. For the "Purr Data" flavor of Pd, suitable packages can be found at https://agraef.github.io/purr-data/#jgu-packages. This guide assumes that you already have pd-pure and pd-faust up and running, and know how to use pd-faust in Pd.
 
-## Description
+[pd-faust]: https://agraef.github.io/pure-docs/pd-faust.html
+[pd-pure]: https://agraef.github.io/pure-docs/pd-pure.html
+
+To compile your Faust sources, you'll also need Grame's Faust compiler, which can be found at http://faust.grame.fr/. Grame only distributes the compiler sources, but ready-made packages are available for Linux (Arch and Ubuntu), Mac (via MacPorts) and Windows, please check the following Wiki page for details:
+
+https://github.com/agraef/pure-lang/wiki/Faust#getting-faust
+
+## Usage
 
 The purpose of this abstraction is to equip pd-faust applications with an interface to control surfaces utilizing the Mackie Control Protocol (MCP). The MCP device can then be used to control your Faust dsps via MIDI. No manual setup is required; once the device is connected to Pd (see below), the mcp.pd patch keeps track of all the MIDI controls in all Faust dsps and configures itself accordingly in a fully automatic fashion.
 
-The faders and encoders of the MCP device are linked to the MIDI controls of your Faust dsps, so moving them changes the controls of the dsp accordingly. Conversely, changing the controls in the Pd GUI sets the controls of the device (if it supports feedback). Scribble strips are supported as well; they will show the name of the controls assigned to each fader and encoder, and also display the corresponding parameter values. If you're using the included midiosc.pd abstraction, the transport keys of the device can be used to control playback.
+The faders and encoders of the MCP device are linked to the MIDI controls of your Faust dsps, so moving them changes the controls of the dsp accordingly. Conversely, changing the controls in the Pd GUI sets the controls of the device (if it supports feedback). Note that to make this work, the Faust controls to be operated need to be assigned to corresponding MIDI controllers; *only* controls with MIDI bindings will show on the MCP surface. The [pd-faust][] manual explains how to create such bindings, and you can also look at the included Faust examples to see how this is done.
 
-## Connection Setup
+Scribble strips are also supported; they will show the name of the controls assigned to each fader and encoder, and also display the corresponding parameter values. Also, if you're using the included midiosc.pd abstraction, the transport keys of the device can be used to control playback.
 
-The first (and only) creation argument of the mcp abstraction denotes the Pd MIDI port number to which the control surface is connected. Port 1 is the default if none is specified, but we recommend to always specify a port number other than 1 there and connect your MCP device to that port, so that you can still connect other MIDI gear and applications to port 1 without having these get mixed up with the MCP input and output. The provided examples have all been set up so that the MCP device is to be connected to port 2.
+Some examples are included which can be run straight away from the source directory. A few sample Faust instruments and effects can be found in the dsp directory. Before running any of the examples, you'll have to compile these; a Makefile is included, so you can just type `make` in the dsp folder to do this.
+
+The provided examples have all been set up so that the MCP device is expected to be connected to Pd's *second* MIDI port, so you'll have to configure your Pd MIDI connections accordingly. E.g., on Linux, make sure that Pd is configured for (at least) two MIDI input and output ports, and use a patchbay utility like QjackCtl to connect your MCP device to Pd's second MIDI input and output.
 
 Normally, you want to have the connections set up beforehand, so that the mcp.pd patch can initialize the fader positions and scribble strips of the device when the patch gets loaded (i.e., at loadbang time).
 
+Once you've compiled the Faust sources and set up the MIDI connections, you can open the simple.pd or synth.pd example in Pd and kick the tires. Both examples contain some Faust units and the corresponding pd-faust GUIs. The included mcp instance will display the scribble strips for the first bank of controls; if your MCP device is connected properly and has a scribble strip display, the strips will also be shown on the device. Also, if your device has motor faders, launching the patch will set them to the initial values of the corresponding Faust controls. You can now start moving the faders and/or encoders of your MCP device and see the controls change accordingly in pd-faust GUIs the patch.
+
+The synth.pd example also includes a modified version of pd-faust's midiosc player, which can be used for MIDI file playback and will be wired up to the MCP device, so that you can use the transport controls of the device to start and stop playback. The simple.pd example only provides live MIDI input; connect your MIDI keyboard (or MIDI player app) to Pd's first MIDI input port and start jamming.
+
+To use the abstraction in your own patches, it's enough to copy the mcp folder to the directory containing your patch. If you prefer, you can also install the abstraction by dropping the mcp folder into one of the locations on Pd's library search path, such as ~/.pd-externals on Linux; please check your local Pd documentation for details.
+
+To insert an instance of the abstraction into your patch, create an object (Ctrl+1) and type `mcp` followed by the MIDI port number to which the MCP device is connected, e.g.:
+
+    mcp 2
+
+This will connect to the device on Pd's second MIDI port. In principle any of Pd's MIDI ports can be used there (if you don't specify any then port 1 will be used by default). But you should make sure that live MIDI input to the Faust dsps is kept separate from the MCP data, because MCP uses note and control data in its own peculiar way, which will sound funny if played back by an instrument.
+
 ## Features
 
-- The abstraction implements controller input and feedback via the faders and encoders of your device. The bank/channel left/right buttons can be used to switch between different banks of faders -- the patch provides as many banks as needed to represent the MIDI controls of your Faust dsps.
+The primary purpose of the mcp abstraction is to take controller input from the faders and encoders of your device and translate them to the corresponding MIDI control changes of the Faust units in your patch. It also provides feedback to the MCP device (moving the faders or lighting up LEDs) if you change the Faust controls directly in the patch.
+
+In addition, the abstraction also offers the following features:
+
+- The bank/channel left/right buttons can be used to switch between different banks of faders -- the patch provides as many banks as needed to represent the MIDI controls of your Faust dsps.
 
 - Instance/unit and control names are shown in the scribble strips of the device, and touching the faders or pushing the encoders toggles the value display in the top line of each scribble strip. The scribble strips are also shown in the abstraction, in case your MCP device doesn't have a display.
 
@@ -27,9 +52,9 @@ Normally, you want to have the connections set up beforehand, so that the mcp.pd
 
 - When used with the midiosc player, the timecode display shows the time (in h/m/s/tenths of seconds) of the current playhead position.
 
-- The abstraction also has bindings for the following function keys on the MCP device: F1 switches the scribble strips between instance and unit name of the Faust dsps; F2 switches the encoder display style (i.e., the way the LEDs light up around the encoders); F3 updates the internal state and redisplays the scribble strips after changes. These functions are also available through the "unitname" and "encoder" toggles and the "reset" bang control shown in the abstraction.
+- The abstraction also has bindings for the following function keys on the MCP device: F1 switches the scribble strips between instance and unit name of the Faust dsps; F2 switches the encoder display style (i.e., the way the LEDs light up around the encoders); F3 tells the abstraction to update its internal state and redisplay the scribble strips after changes to the Faust dsps. These functions are also available through the "unitname" and "encoder" toggles and the "reset" bang control shown in the abstraction.
 
-Obviously, some of these features may or may not work depending on the MCP device that you have. Both Mackie MCU and X-Touch should enable all features, but some cheaper MCP devices may not offer transport and function keys, push encoders, fader touch detection, scribble strips, or a timecode display.
+Obviously, some of these features may or may not be available depending on the MCP device that you have. Both Mackie MCU and X-Touch should enable all features, but some cheaper MCP devices may not offer transport or function keys, push encoders, fader touch detection, scribble strips, or a timecode display.
 
 ## TODO
 
