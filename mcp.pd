@@ -1,45 +1,45 @@
-#N canvas 461 225 559 472 10;
-#X obj 18 44 midi-input;
-#X obj 216 45 r midiout;
-#X obj 216 133 unpack f f;
-#X obj 216 271 bendout;
-#X floatatom 389 211 5 0 0 0 - - -, f 5;
-#X obj 431 72 tgl 15 0 empty empty encoder 17 7 0 10 -262144 -1 -1
-0 1;
-#X obj 458 154 * 32;
-#X obj 18 199 r midistrip;
-#X floatatom 431 211 5 0 0 0 - - -, f 5;
-#X obj 458 176 + 32;
-#X obj 389 178 + 32;
-#X floatatom 216 244 5 0 0 0 - - -, f 5;
-#X floatatom 255 244 5 0 0 0 - - -, f 5;
-#X obj 216 67 ctl2mcp;
-#X obj 216 111 route bend ctl;
-#X obj 286 133 unpack f f;
-#X obj 255 220 + 16;
-#X text 280 270 output on second port;
-#X obj 18 125 mcp2ctl;
-#X obj 18 147 outlet;
-#X obj 18 221 mcpstrip;
-#X obj 18 176 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#N canvas 514 150 566 515 10;
+#X obj 18 94 midi-input;
+#X obj 216 95 r midiout;
+#X obj 216 183 unpack f f;
+#X obj 216 321 bendout;
+#X floatatom 389 261 5 0 0 0 - - -, f 5;
+#X obj 304 22 tgl 15 0 empty empty F2\ encoder 17 7 0 10 -262144 -1
+-1 0 1;
+#X obj 458 204 * 32;
+#X obj 18 249 r midistrip;
+#X floatatom 431 261 5 0 0 0 - - -, f 5;
+#X obj 458 226 + 32;
+#X obj 389 228 + 32;
+#X floatatom 216 294 5 0 0 0 - - -, f 5;
+#X floatatom 255 294 5 0 0 0 - - -, f 5;
+#X obj 216 117 ctl2mcp;
+#X obj 216 161 route bend ctl;
+#X obj 286 183 unpack f f;
+#X obj 255 270 + 16;
+#X text 280 320 output on second port;
+#X obj 18 175 mcp2ctl;
+#X obj 18 197 outlet;
+#X obj 18 271 mcpstrip;
+#X obj 18 226 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 360 133 s midistrip;
-#X obj 360 72 tgl 15 0 empty empty unitname 17 7 0 10 -262144 -1 -1
-0 1;
-#X obj 431 101 t b f;
-#X obj 18 88 t a a;
-#X obj 119 114 route note;
-#X msg 119 136 \$2 \$1;
-#X obj 119 158 route 127;
-#X obj 119 223 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 360 183 s midistrip;
+#X obj 203 22 tgl 15 0 empty empty F1\ unitname 17 7 0 10 -262144 -1
+-1 0 1;
+#X obj 431 151 t b f;
+#X obj 18 138 t a a;
+#X obj 119 164 route note;
+#X msg 119 186 \$2 \$1;
+#X obj 119 208 route 127;
+#X obj 119 273 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 119 180 t f f;
-#X obj 119 244 t f f;
-#X obj 119 266 * 127;
-#X obj 119 332 midi-output;
-#X obj 159 224 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 119 230 t f f;
+#X obj 119 294 t f f;
+#X obj 119 316 * 127;
+#X obj 119 382 midi-output;
+#X obj 159 274 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 159 244 t f f;
+#X obj 159 294 t f f;
 #N canvas 296 157 622 436 transport 0;
 #X obj 92 62 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
 ;
@@ -194,34 +194,66 @@
 #X connect 65 0 62 1;
 #X connect 65 0 57 1;
 #X connect 65 0 58 1;
-#X restore 214 310 pd transport;
-#X obj 17 276 loadbang;
-#X msg 17 298 write \, write 1 \; pd dsp 1;
-#X obj 272 334 r reload;
-#X msg 291 390 reload;
-#X obj 291 412 s midistrip;
-#X obj 431 52 bng 15 250 50 0 empty empty reset 17 7 0 10 -262144 -1
+#X restore 214 360 pd transport;
+#X obj 17 326 loadbang;
+#X msg 17 418 write \, write 1 \; pd dsp 1;
+#X obj 272 384 r reload;
+#X msg 291 440 reload;
+#X obj 291 462 s midistrip;
+#X obj 405 22 bng 15 250 50 0 empty empty F3\ reset 17 7 0 10 -262144
+-1 -1;
+#X obj 146 462 s faustdsp;
+#X obj 119 252 sel 54 55 56;
+#X obj 272 406 t b b b;
+#X msg 341 440 write 0;
+#X msg 146 440 write \, write 1;
+#X obj 146 417 delay 1000;
+#X obj 332 406 t b b b;
+#X obj 18 116 midifilter \$1;
+#X obj 389 291 ctlout;
+#X obj 135 94 r \$0-chan;
+#X obj 119 338 pack f f f;
+#X obj 18 293 midi-output \$1;
+#X msg 119 360 note \$2 \$1 \$3;
+#X obj 440 326 loadbang;
+#X obj 440 348 f \$1;
+#X obj 440 370 max 1;
+#X obj 440 392 - 1;
+#X obj 440 414 * 16;
+#X obj 440 436 + 1;
+#X obj 440 458 s \$0-chan;
+#X symbolatom 20 47 8 0 0 0 - stripu1 -, f 8;
+#X symbolatom 77 47 8 0 0 0 - stripu2 -, f 8;
+#X symbolatom 134 47 8 0 0 0 - stripu3 -, f 8;
+#X symbolatom 191 47 8 0 0 0 - stripu4 -, f 8;
+#X symbolatom 248 47 8 0 0 0 - stripu5 -, f 8;
+#X symbolatom 305 47 8 0 0 0 - stripu6 -, f 8;
+#X symbolatom 362 47 8 0 0 0 - stripu7 -, f 8;
+#X symbolatom 419 47 8 0 0 0 - stripu8 -, f 8;
+#X symbolatom 20 67 8 0 0 0 - stripl1 -, f 8;
+#X symbolatom 77 67 8 0 0 0 - stripl2 -, f 8;
+#X symbolatom 134 67 8 0 0 0 - stripl3 -, f 8;
+#X symbolatom 191 67 8 0 0 0 - stripl4 -, f 8;
+#X symbolatom 248 67 8 0 0 0 - stripl5 -, f 8;
+#X symbolatom 305 67 8 0 0 0 - stripl6 -, f 8;
+#X symbolatom 362 67 8 0 0 0 - stripl7 -, f 8;
+#X symbolatom 419 67 8 0 0 0 - stripl8 -, f 8;
+#X obj 17 348 t b b;
+#N canvas 960 275 450 324 stripinit 0;
+#X msg 14 73 \; stripu1 symbol \; stripu2 symbol \; stripu3 symbol
+\; stripu4 symbol \; stripu5 symbol \; stripu6 symbol \; stripu7 symbol
+\; stripu8 symbol;
+#X obj 14 50 t b b;
+#X msg 124 73 \; stripl1 symbol \; stripl2 symbol \; stripl3 symbol
+\; stripl4 symbol \; stripl5 symbol \; stripl6 symbol \; stripl7 symbol
+\; stripl8 symbol;
+#X obj 14 27 inlet;
+#X connect 1 0 0 0;
+#X connect 1 1 2 0;
+#X connect 3 0 1 0;
+#X restore 33 382 pd stripinit;
+#X obj 66 348 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 146 412 s faustdsp;
-#X obj 119 202 sel 54 55 56;
-#X obj 272 356 t b b b;
-#X msg 341 390 write 0;
-#X msg 146 390 write \, write 1;
-#X obj 146 367 delay 1000;
-#X obj 332 356 t b b b;
-#X obj 18 66 midifilter \$1;
-#X obj 389 241 ctlout;
-#X obj 135 44 r \$0-chan;
-#X obj 119 288 pack f f f;
-#X obj 18 243 midi-output \$1;
-#X msg 119 310 note \$2 \$1 \$3;
-#X obj 440 276 loadbang;
-#X obj 440 298 f \$1;
-#X obj 440 320 max 1;
-#X obj 440 342 - 1;
-#X obj 440 364 * 16;
-#X obj 440 386 + 1;
-#X obj 440 408 s \$0-chan;
 #X connect 0 0 50 0;
 #X connect 1 0 13 0;
 #X connect 2 0 11 0;
@@ -261,7 +293,7 @@
 #X connect 34 0 35 0;
 #X connect 35 0 32 0;
 #X connect 35 1 5 0;
-#X connect 37 0 38 0;
+#X connect 37 0 79 0;
 #X connect 38 0 43 0;
 #X connect 39 0 45 0;
 #X connect 40 0 41 0;
@@ -290,4 +322,7 @@
 #X connect 59 0 60 0;
 #X connect 60 0 61 0;
 #X connect 61 0 62 0;
-#X coords 0 -1 1 1 139 41 1 355 50;
+#X connect 79 0 38 0;
+#X connect 79 1 80 0;
+#X connect 81 0 80 0;
+#X coords 0 -1 1 1 463 70 1 13 20;

@@ -1,4 +1,4 @@
-#N canvas 372 242 743 409 10;
+#N canvas 386 222 744 445 10;
 #X obj 134 305 dac~;
 #N canvas 852 209 450 300 synth 0;
 #X obj 10 30 hsl 128 15 0 1 0 0 synth:subtractive/attack synth:subtractive/attack
@@ -28,9 +28,9 @@ synth:subtractive/cutoff-harmonic cutoff-harmonic -2 -6 0 10 -262144
 synth:subtractive/cutoff-harmonic empty 0 -6 0 10 -262144 -1 -1 6 256
 0;
 #X obj 10 210 hsl 128 15 0 1 0 0 synth:subtractive/vol synth:subtractive/vol
-vol -2 -6 0 10 -262144 -1 -1 3810 1;
+vol -2 -6 0 10 -262144 -1 -1 8890 1;
 #X obj 160 210 nbx 5 14 0 1 0 0 synth:subtractive/vol synth:subtractive/vol
-empty 0 -6 0 10 -262144 -1 -1 0.3 256 0;
+empty 0 -6 0 10 -262144 -1 -1 0.7 256 0;
 #X obj 10 240 hsl 128 15 0 1 0 0 synth:subtractive/pan synth:subtractive/pan
 pan -2 -6 0 10 -262144 -1 -1 6350 1;
 #X obj 160 240 nbx 5 14 0 1 0 0 synth:subtractive/pan synth:subtractive/pan
@@ -97,8 +97,8 @@ wet -2 -6 0 10 -262144 -1 -1 4233 1;
 #X coords 0 -1 1 1 235 150 1 0 0;
 #X restore 482 174 pd fx2;
 #X obj 14 252 faust~ chorus fx1, f 24;
-#X obj 236 306 mcp 2;
-#X obj 236 352 s faustdsp;
+#X obj 236 333 mcp 2;
+#X obj 236 409 s faustdsp;
 #N canvas 766 265 451 324 midiin 0;
 #X obj 25 21 midi-input;
 #X obj 25 44 midifilter 1;
@@ -111,7 +111,7 @@ wet -2 -6 0 10 -262144 -1 -1 4233 1;
 #X connect 2 0 3 0;
 #X connect 2 1 4 0;
 #X connect 5 0 2 0;
-#X restore 322 352 pd midiin;
+#X restore 322 409 pd midiin;
 #X obj 12 18 midiosc "bwv772.mid";
 #X obj 12 123 s player;
 #X obj 14 276 faust~ freeverb fx2, f 24;

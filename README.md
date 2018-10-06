@@ -21,13 +21,13 @@ Normally, you want to have the connections set up beforehand, so that the mcp.pd
 
 - The abstraction implements controller input and feedback via the faders and encoders of your device. The bank/channel left/right buttons can be used to switch between different banks of faders -- the patch provides as many banks as needed to represent the MIDI controls of your Faust dsps.
 
-- Instance/unit and control names are shown in the scribble strips of the device, and touching the faders or pushing the encoders toggles the value display in the top line of each scribble strip.
+- Instance/unit and control names are shown in the scribble strips of the device, and touching the faders or pushing the encoders toggles the value display in the top line of each scribble strip. The scribble strips are also shown in the abstraction, in case your MCP device doesn't have a display.
 
 - When used with the included (modified) version of the pd-faust midiosc player, the transport controls will work as follows: the "rewind" key moves the playhead to the beginning of the MIDI file, "fast forward" moves it to the end; "stop" stops, and "play" toggles playback; "record" toggles the player's OSC automation recording; "cycle" toggles the player's loop function; and the big jog wheel and the cursor left/right keys move the playhead in smaller and larger increments, respectively.
 
 - When used with the midiosc player, the timecode display shows the time (in h/m/s/tenths of seconds) of the current playhead position.
 
-- The abstraction also has bindings for the following function keys on the MCP device: F1 switches the scribble strips between instance and unit name of the Faust dsps; F2 switches the encoder display style (i.e., the way the LEDs light up around the encoders); F3 updates the internal state and redisplays the scribble strips after changes.
+- The abstraction also has bindings for the following function keys on the MCP device: F1 switches the scribble strips between instance and unit name of the Faust dsps; F2 switches the encoder display style (i.e., the way the LEDs light up around the encoders); F3 updates the internal state and redisplays the scribble strips after changes. These functions are also available through the "unitname" and "encoder" toggles and the "reset" bang control shown in the abstraction.
 
 Obviously, some of these features may or may not work depending on the MCP device that you have. Both Mackie MCU and X-Touch should enable all features, but some cheaper MCP devices may not offer transport and function keys, push encoders, fader touch detection, scribble strips, or a timecode display.
 

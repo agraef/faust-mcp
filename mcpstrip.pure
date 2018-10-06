@@ -48,6 +48,8 @@ end;
 clearstrip num::int =
 {stripmsg 0 num text, stripmsg 1 num text} when
   text = "       ";
+  pd_send (sprintf "stripu%d" (int num+1)) "";
+  pd_send (sprintf "stripl%d" (int num+1)) "";
 end if num >= 0 && num <= 7;
 
 // display a strip
@@ -67,6 +69,8 @@ showstrip num = case mcp::getstrip (mcp::getccnum num) of
 	       p = if mcp::gettoggle then last else head;
 	     end;
     text2  = abbrv (last lablst);
+    pd_send (sprintf "stripu%d" (int num+1)) text1;
+    pd_send (sprintf "stripl%d" (int num+1)) text2;
   end;
   _ = clearstrip num otherwise;
 end if num >= 0 && num <= 7;
@@ -78,6 +82,7 @@ showval num flag = case mcp::getstrip (mcp::getccnum num) of
   strip label min max step _ ccnum chan = stripmsg 0 num text when
     val = mcp::getval ccnum;
     text = take 7 (sprintf "%7g" (stripval min max step val));
+    pd_send (sprintf "stripu%d" (int num+1)) text;
     mcp::getview || mcp::setview (int flag);
   end if flag > 0;
   _ = () otherwise;
