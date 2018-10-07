@@ -56,7 +56,7 @@ In addition, the abstraction also offers various other useful functions, mostly 
 
 - **Scribble strips:** Instance/unit and control names are shown in the scribble strips of the device, and touching the faders or pushing the encoders toggles the value display in the top line of each scribble strip. The scribble strips are also shown in the abstraction, in case your MCP device doesn't have a display.
 
-- **Display options:** The following options are assigned to some of the function keys of the MCP device: F1 switches the scribble strips between instance and unit name of the Faust dsps; F2 switches the encoder display style (i.e., the way the LEDs light up around the encoders); and F3 tells the abstraction to update its internal state and redisplay the scribble strips (which is used to force an update of the display after editing the Faust dsps in a patch). These functions are also available through the "unitname" and "encoder" toggles and the "reset" bang control shown in the abstraction.
+- **Display options:** The following options are assigned to some of the function keys of the MCP device: F1 switches the scribble strips between instance and unit name of the Faust dsps; F2 switches the encoder display style (i.e., the way the LEDs light up around the encoders); and F3 tells the abstraction to update its internal state and redisplay the scribble strips (which can be used to force an update of the display after edits). These functions are also available through the "unitname" and "encoder" toggles and the "reset" bang control shown in the abstraction.
 
 - **Playback and transport:** When used with the included (modified) version of the pd-faust midiosc player, the transport controls will work as follows: the "rewind" key moves the playhead to the beginning of the MIDI file, "fast forward" moves it to the end; "stop" stops, and "play" toggles playback; "record" toggles the player's OSC automation recording; "cycle" toggles the player's loop function; and the big jog wheel and the cursor left/right keys move the playhead in smaller and larger increments, respectively. In addition, the function keys F4, F5 and F6 are assigned to some special OSC recording functions ("save", "abort" and "clear"). Please check the description of the midosc abstraction in the [pd-faust][] documentation for the meaning of these operations.
 
@@ -65,8 +65,6 @@ In addition, the abstraction also offers various other useful functions, mostly 
 Obviously, some of these functions may or may not be available depending on the MCP device that you have. Both Mackie MCU and X-Touch should enable all features, but some cheaper MCP devices may not offer transport or function keys, push encoders, fader touch detection, scribble strips, or a timecode display.
 
 ## TODO
-
-- At present it's necessary to manually invoke "reset" (F3) to update the MCP state after changes which affect the collection of loaded Faust units. This should preferably be automatic, but pd-faust currently doesn't offer any notifications about such changes.
 
 - There's no musical time display right now. This requires non-trivial changes in pd-faust itself, as its built-in sequencer currently doesn't provide musical timing information to the player abstraction.
 

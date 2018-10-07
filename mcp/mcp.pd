@@ -1,4 +1,4 @@
-#N canvas 530 246 570 523 10;
+#N canvas 550 239 575 530 10;
 #X obj 18 94 midi-input;
 #X obj 216 95 r midiout;
 #X obj 216 183 unpack f f;
@@ -16,7 +16,7 @@
 #X obj 216 117 ctl2mcp;
 #X obj 286 183 unpack f f;
 #X obj 255 270 + 16;
-#X text 280 320 output on second port;
+#X text 270 314 output on second port;
 #X obj 18 175 mcp2ctl;
 #X obj 18 197 outlet;
 #X obj 18 271 mcpstrip;
@@ -68,7 +68,7 @@
 #X obj 233 40 t b b;
 #X msg 233 62 1 0;
 #X msg 263 62 0;
-#X obj 192 62 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 192 62 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 192 82 t f f;
 #X obj 192 104 * 127;
@@ -213,11 +213,11 @@
 #X obj 291 462 s midistrip;
 #X obj 390 26 bng 15 250 50 0 empty empty F3\ reset 17 7 0 10 -262144
 -1 -1;
-#X obj 146 462 s faustdsp;
+#X obj 146 482 s faustdsp;
 #X obj 119 252 sel 54 55 56;
 #X obj 272 406 t b b b;
 #X msg 341 440 write 0;
-#X msg 146 440 write \, write 1;
+#X msg 146 460 write \, write 1;
 #X obj 146 417 delay 1000;
 #X obj 332 406 t b b b;
 #X obj 18 116 midifilter \$1;
@@ -231,8 +231,8 @@
 #X obj 440 370 max 1;
 #X obj 440 392 - 1;
 #X obj 440 414 * 16;
-#X obj 440 436 + 1;
-#X obj 440 458 s \$0-chan;
+#X obj 440 458 + 1;
+#X obj 440 480 s \$0-chan;
 #X symbolatom 20 47 8 0 0 0 - stripu1 -, f 8;
 #X symbolatom 77 47 8 0 0 0 - stripu2 -, f 8;
 #X symbolatom 134 47 8 0 0 0 - stripu3 -, f 8;
@@ -271,6 +271,12 @@
 #X obj 351 257 + 16;
 #X floatatom 351 279 5 0 0 0 - - -, f 5;
 #X obj 294 275 touchout;
+#X obj 340 336 r faust-notify;
+#X obj 340 358 t b;
+#X obj 340 380 del 100;
+#X obj 440 436 t f f;
+#X obj 146 439 t b b;
+#X msg 233 439 clear;
 #X connect 0 0 49 0;
 #X connect 1 0 13 0;
 #X connect 2 0 11 0;
@@ -322,8 +328,8 @@
 #X connect 44 2 45 0;
 #X connect 45 0 42 0;
 #X connect 46 0 42 0;
-#X connect 47 0 46 0;
-#X connect 48 0 46 0;
+#X connect 47 0 91 0;
+#X connect 48 0 91 0;
 #X connect 48 1 39 0;
 #X connect 48 2 45 0;
 #X connect 49 0 24 0;
@@ -335,7 +341,7 @@
 #X connect 56 0 57 0;
 #X connect 57 0 58 0;
 #X connect 58 0 59 0;
-#X connect 59 0 60 0;
+#X connect 59 0 90 0;
 #X connect 60 0 61 0;
 #X connect 78 0 37 0;
 #X connect 78 1 79 0;
@@ -348,4 +354,13 @@
 #X connect 83 0 86 0;
 #X connect 84 0 85 0;
 #X connect 85 0 86 1;
+#X connect 87 0 88 0;
+#X connect 88 0 89 0;
+#X connect 89 0 44 0;
+#X connect 90 0 60 0;
+#X connect 90 1 84 1;
+#X connect 90 1 15 1;
+#X connect 91 0 46 0;
+#X connect 91 1 92 0;
+#X connect 92 0 40 0;
 #X coords 0 -1 1 1 463 70 1 13 20;
