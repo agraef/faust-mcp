@@ -46,17 +46,29 @@ To insert an instance of the abstraction into your patch, create an object (Ctrl
 
 This will connect to the device on Pd's second MIDI port. In principle any of Pd's MIDI ports can be used there (if you don't specify any then port 1 will be used by default). But you should make sure that live MIDI input to the Faust dsps is kept separate from the MCP data, because MCP uses note and control data in its own peculiar way, which will sound funny if played back by an instrument.
 
+The abstraction shows a mirror of the scribble strips, as they will render on an MCP device, as well as some buttons and toggles in the top row which can be used to control the most essential functions. All these functions are also available using corresponding controls on the MCP device, as discussed in the next section; in the following list we give the equivalent MCP functions in parentheses.
+
+- The first two bang controls, labeled "<" and ">", switch to the previous and next bank of eight faders, respectively. The abstraction provides as many banks as needed to represent all MIDI controls of all Faust dsps. (MCP: bank left/right keys)
+
+- The "value" toggle, when engaged, shows the current values of the controls in the top row of the scribble strips. (MCP: touch a fader, or push an encoder)
+
+- The "dspname" toggle switches the scribble strips between showing the instance and the actual dsp name of the Faust unit. (MCP: F1 key)
+
+- The "encoder" toggle switches between two alternative display styles ("fan" and "pan") for the encoder LED rings. Fan style (the default) shows an arc from 0 to the current value, while pan style shows just a single tick between min and max markers. (MCP: F2 key)
+
+- The bang control on the right resets the internal state of the abstraction and redisplays the scribble strips. (MCP: F3 key)
+
 ## Controller functions
 
 The primary purpose of the mcp abstraction is to take controller input from the faders and encoders of your device and map them to the corresponding MIDI control changes of the Faust units in your patch. It also does the reverse translation, providing feedback to the MCP device (moving the faders or lighting up LEDs) if you change the Faust controls in the patch.
 
 In addition, the abstraction also offers various other useful functions, mostly accessible through special keys on the MCP device:
 
-- **Bank changes:** The bank left/right buttons can be used to switch between different banks of eight faders, and the channel left/right buttons move by one control at a time. The abstraction provides as many banks as needed to represent all MIDI controls of all Faust dsps.
+- **Bank changes:** The bank left/right buttons can be used to switch between different banks, and the channel left/right buttons move by one control at a time.
 
-- **Scribble strips:** Instance/unit and control names are shown in the scribble strips of the device, and touching the faders or pushing the encoders toggles the value display in the top line of each scribble strip. The scribble strips are also shown in the abstraction, in case your MCP device doesn't have a display.
+- **Scribble strips:** Instance/unit and control names are shown in the scribble strips of the device, and touching the faders or pushing the encoders toggles the value display in the top line of each scribble strip.
 
-- **Display options:** The following options are assigned to some of the function keys of the MCP device: F1 switches the scribble strips between instance and unit name of the Faust dsps; F2 switches the encoder display style (i.e., the way the LEDs light up around the encoders); and F3 tells the abstraction to update its internal state and redisplay the scribble strips (which can be used to force an update of the display after edits). These functions are also available through the "unitname" and "encoder" toggles and the "reset" bang control shown in the abstraction.
+- **Display options:** The following options are assigned to some of the function keys of the MCP device: F1 switches the scribble strips between instance and unit name of the Faust dsps; F2 switches the encoder style (i.e., the way the LED rings light up around the encoders); and F3 tells the abstraction to update its internal state and redisplay the scribble strips (which can be used to force an update of the display after edits).
 
 - **Playback and transport:** When used with the included (modified) version of the pd-faust midiosc player, the transport controls will work as follows: the "rewind" key moves the playhead to the beginning of the MIDI file, "fast forward" moves it to the end; "stop" stops, and "play" toggles playback; "record" toggles the player's OSC automation recording; "cycle" toggles the player's loop function; and the big jog wheel and the cursor left/right keys move the playhead in smaller and larger increments, respectively. In addition, the function keys F4, F5 and F6 are assigned to some special OSC recording functions ("save", "abort" and "clear"). Please check the description of the midosc abstraction in the [pd-faust][] documentation for the meaning of these operations.
 
