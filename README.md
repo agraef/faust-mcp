@@ -1,26 +1,40 @@
 
 # faust-mcp
 
-This package provides an abstraction mcp.pd (along with some helper abstractions and Pure externals) which interfaces [pd-faust][] to Mackie MCU devices and compatible equipment such as Behringer's X-Touch (which was the actual device used for testing).
+This package provides a [Pd][pd] abstraction mcp.pd (along with some helper abstractions and externals) which lets you control your [Faust][] instruments and effects more conveniently with control surfaces utilizing the Mackie Control Protocol (MCP).
 
-To use the abstraction, you'll need to have the latest versions of [pd-pure][] and [pd-faust][] installed and enabled in Pd. These extensions are part of the Pure programming system. Ready-made packages are available for Linux (Arch and Ubuntu), Mac and Windows, please see https://agraef.github.io/pure-lang/ for details. For the "Purr Data" flavor of Pd, suitable packages can be found at https://agraef.github.io/purr-data/#jgu-packages. This guide assumes that you already have pd-pure and pd-faust up and running, and know how to use pd-faust in Pd.
+To use the abstraction, you'll need:
 
+- [Pd][pd] by Miller Puckette, or [Purr Data][purr-data] by Jonathan Wilkes; mcp.pd was developed on the latter, which is a more user-friendly Pd version, but should also work with the former, "vanilla" Pd version.
+
+- An MCP-compatible device, such as the [Mackie MCU][] or the Behringer [X-Touch][]. The abstraction has been tested on the X-Touch, the X-Touch ONE, the X-Touch Mini (in MCP mode), and the Korg nanoKONTROL2 (in Cubase/MCP mode). Note that you *can* use mcp.pd without a real MCP device, but that defeats the purpose, since the main idea behind the patch is to facilitate control of your Faust dsps with real hardware.
+
+- The latest versions of [pd-pure][] and [pd-faust][] must be installed and enabled in Pd. These Pd extensions are part of the [Pure][] programming system. Ready-made packages are available for Linux (Arch and Ubuntu), Mac and Windows, please check the Pure website for details. For the [Purr Data][purr-data] flavor of Pd, see https://agraef.github.io/purr-data/#jgu-packages.
+
+- To compile your Faust sources, you'll also need gcc, the GNU C/C++ compiler (readily available on most systems), and Grame's Faust compiler, which can be found at http://faust.grame.fr/. Grame only distributes the compiler sources, but ready-made packages are available for Linux (Arch and Ubuntu), Mac (via MacPorts) and Windows, please check the following Wiki page for details: https://github.com/agraef/pure-lang/wiki/Faust#getting-faust
+
+[pd]: http://puredata.info/
+[purr-data]: https://agraef.github.io/purr-data/
 [pd-faust]: https://agraef.github.io/pure-docs/pd-faust.html
 [pd-pure]: https://agraef.github.io/pure-docs/pd-pure.html
-
-To compile your Faust sources, you'll also need gcc, the GNU C/C++ compiler (readily available on most systems), and Grame's Faust compiler, which can be found at http://faust.grame.fr/. Grame only distributes the compiler sources, but ready-made packages are available for Linux (Arch and Ubuntu), Mac (via MacPorts) and Windows, please check the following Wiki page for details:
-
-https://github.com/agraef/pure-lang/wiki/Faust#getting-faust
+[Faust]: http://faust.grame.fr/
+[Pure]: https://agraef.github.io/pure-lang/
+[Mackie MCU]: https://mackie.com/products/mcu-pro-and-xt-pro
+[X-Touch]: https://www.musictribe.com/Categories/Behringer/Computer-Audio/Desktop-Controllers/X-TOUCH/p/P0B1X
 
 ## Description
 
-The purpose of this abstraction is to equip pd-faust applications with an interface to control surfaces utilizing the Mackie Control Protocol (MCP). The MCP device can then be used to control your Faust dsps via MIDI. No manual setup is required; once the device is connected to Pd (see below), the mcp.pd patch keeps track of all the MIDI controls in all Faust dsps and configures itself accordingly in a fully automatic fashion.
+The purpose of this abstraction is to equip pd-faust applications with an interface to MCP control surfaces. Basically, it is a specialized MIDI mapper which translates MCP to standard MIDI control changes and vice versa. This allows the MCP device to be used to control your Faust dsps via MIDI. No manual setup is required; once the device is connected to Pd (see below), the mcp.pd patch keeps track of all the MIDI controls in all Faust dsps and configures itself accordingly in a fully automatic fashion.
 
 The faders and encoders of the MCP device are linked to the MIDI controls of your Faust dsps, so moving them changes the controls of the dsp accordingly. Conversely, changing the controls in the Pd GUI sets the controls of the device (if it supports feedback). Note that to make this work, the Faust controls to be operated need to be assigned to corresponding MIDI controllers; *only* controls with MIDI bindings will show on the MCP surface. The [pd-faust][] manual explains how to create such bindings, and you can also look at the included Faust examples to see how this is done.
+
+The controls are organized into banks of eight faders and encoders. The abstraction provides as many banks as needed to represent all MIDI controls of all Faust dsps. The usual bank and channel controls on the MCP device can be used to switch between different banks as needed, so that all controls with MIDI bindings become accessible.
 
 Scribble strips are also supported; they will show the name of the Faust units and controls assigned to each fader and encoder, or display the corresponding parameter values. Also, if you're using the included midiosc.pd abstraction, the transport keys of the device can be used to control playback. There are a number of other useful features like these, which will be described in more detail below.
 
 ## Usage
+
+This guide assumes that you already have pd-pure and pd-faust up and running, and know how to use pd-faust in Pd.
 
 Some examples are included for illustration purposes and to help you get up and running quickly. You can run these straight from the source directory. The sources also include a few sample Faust instruments and effects in the dsp subdirectory. Before running any of the examples, you'll have to compile these with the Faust compiler. A Makefile is included, so you can just type `make` in the dsp folder to do this.
 
@@ -46,13 +60,13 @@ To insert an instance of the abstraction into your patch, create an object (Ctrl
 
 This will connect to the device on Pd's second MIDI port. In principle any of Pd's MIDI ports can be used there (if you don't specify any then port 1 will be used by default). But you should make sure that live MIDI input to the Faust dsps is kept separate from the MCP data, because MCP uses note and control data in its own peculiar way, which will sound funny if played back by an instrument.
 
-The abstraction shows a mirror of the scribble strips, as they will render on an MCP device, as well as some buttons and toggles in the top row which can be used to control the most essential functions. All these functions are also available using corresponding controls on the MCP device, as discussed in the next section; in the following list we give the equivalent MCP functions in parentheses.
+The abstraction shows a mirror of the scribble strips, as they will render on the MCP device, as well as some buttons and toggles in the top row which can be used to control the most essential functions. All these functions are also available using corresponding controls on the MCP device, as described in the next section; in the following list we give the equivalent MCP functions in parentheses.
 
-- The first two bang controls, labeled "<" and ">", switch to the previous and next bank of eight faders, respectively. The abstraction provides as many banks as needed to represent all MIDI controls of all Faust dsps. (MCP: bank left/right keys)
+- The first two bang controls, labeled "<" and ">", switch to the previous and next bank of eight faders, respectively. (MCP: bank left/right keys)
 
 - The "value" toggle, when engaged, shows the current values of the controls in the top row of the scribble strips. (MCP: touch a fader, or push an encoder)
 
-- The "dspname" toggle switches the scribble strips between showing the instance and the actual dsp name of the Faust unit. (MCP: F1 key)
+- The "dspname" toggle switches the scribble strips between showing the instance and the dsp name of the Faust unit. (MCP: F1 key)
 
 - The "encoder" toggle switches between two alternative display styles ("fan" and "pan") for the encoder LED rings. Fan style (the default) shows an arc from 0 to the current value, while pan style shows just a single tick between min and max markers. (MCP: F2 key)
 
@@ -66,18 +80,14 @@ In addition, the abstraction also offers various other useful functions, mostly 
 
 - **Bank changes:** The bank left/right buttons can be used to switch between different banks, and the channel left/right buttons move by one control at a time.
 
-- **Scribble strips:** Instance/unit and control names are shown in the scribble strips of the device, and touching the faders or pushing the encoders toggles the value display in the top line of each scribble strip.
+- **Scribble strips:** Instance/dsp and control names are shown in the scribble strips of the device, and touching the faders or pushing the encoders toggles the value display in the top line of each scribble strip.
 
-- **Display options:** The following options are assigned to some of the function keys of the MCP device: F1 switches the scribble strips between instance and unit name of the Faust dsps; F2 switches the encoder style (i.e., the way the LED rings light up around the encoders); and F3 tells the abstraction to update its internal state and redisplay the scribble strips (which can be used to force an update of the display after edits).
+- **Display options:** The following options are assigned to some of the function keys of the MCP device: F1 switches the scribble strips between instance and dsp name of the Faust units; F2 switches the encoder style (i.e., the way the LED rings light up around the encoders); and F3 tells the abstraction to update its internal state and redisplay the scribble strips (which can be used to force an update of the display after edits).
 
 - **Playback and transport:** When used with the included (modified) version of the pd-faust midiosc player, the transport controls will work as follows: the "rewind" key moves the playhead to the beginning of the MIDI file, "fast forward" moves it to the end; "stop" stops, and "play" toggles playback; "record" toggles the player's OSC automation recording; "cycle" toggles the player's loop function; and the big jog wheel and the cursor left/right keys move the playhead in smaller and larger increments, respectively. In addition, the function keys F4, F5 and F6 are assigned to some special OSC recording functions ("save", "abort" and "clear"). Please check the description of the midosc abstraction in the [pd-faust][] documentation for the meaning of these operations.
 
 - **Timecode:** When used with the midiosc player, the timecode display shows the time (in h/m/s/tenths of seconds) of the current playhead position.
 
+Note that there's no musical time display right now. Implementing this would require non-trivial changes in pd-faust itself, as its built-in sequencer currently doesn't provide musical timing information to the player abstraction.
+
 Obviously, some of these functions may or may not be available depending on the MCP device that you have. Both Mackie MCU and X-Touch should enable all features, but some cheaper MCP devices may not offer transport or function keys, push encoders, fader touch detection, scribble strips, or a timecode display.
-
-## TODO
-
-- There's no musical time display right now. This requires non-trivial changes in pd-faust itself, as its built-in sequencer currently doesn't provide musical timing information to the player abstraction.
-
-- We might want to rewrite the patch to use OSC instead of MIDI for communicating with the Faust dsps, so that all controls become accessible. But then again, restricting access to controls with MIDI bindings gives you better control over which parameters should be visible on the control surface.
