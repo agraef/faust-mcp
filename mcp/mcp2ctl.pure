@@ -1,7 +1,7 @@
 
 using mcpstate;
 
-mcp2ctl (note num val chan) = case int num of
+mcp2ctl (note num val _) = case int num of
   46 = if bank_left then out else () if val > 0;
   47 = if bank_right then out else () if val > 0;
   48 = if channel_left then out else () if val > 0;
@@ -13,7 +13,7 @@ mcp2ctl (note num val chan) = case int num of
     pd_send "midistrip" (view (num-32) (2*~mcp::getview));
   end if num >= 32 && num <= 39 && val > 0;
   = () otherwise;
-end if chan >= 17 with
+end with
   bank_left = mcp::setoffs num $$ true if num >= 0 when
     num = 8*(mcp::getoffs div 8);
     num = if num < mcp::getoffs then num else num-8;
@@ -40,7 +40,8 @@ end if chan >= 17 with
   end;
 end;
 
-mcp2ctl (bend val chan) = convert (bend val (chan-16)) if chan >= 17 with
+mcp2ctl (bend val chan) = convert (bend val (channel chan)) with
+  channel chan = (int chan-1) mod 16 + 1;
   convert (bend val chan) = ctl v num ccchan when
     ccchan = mcp::getccchan num;
     v = (val+8192)/128;
@@ -51,8 +52,8 @@ mcp2ctl (bend val chan) = convert (bend val (chan-16)) if chan >= 17 with
   end;
 end;
 
-mcp2ctl (ctl val num chan) = convert (ctl val num (chan-16)) if chan >= 17 with
-  convert (ctl val num chan) = ctl (change num val ccchan) num ccchan when
+mcp2ctl (ctl val num _) = convert (ctl val num 1) with
+  convert (ctl val num _) = ctl (change num val ccchan) num ccchan when
     ccchan = mcp::getccchan num;
   end if num >= 0 when
     mcp::getview && pd_send "midistrip" (view (num-16) 1);

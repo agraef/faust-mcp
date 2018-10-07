@@ -1,12 +1,16 @@
 
 using mcpstate;
 
-mcptime t = vector msgs when
-  m = int (t/60); s = int (t-60*m);
-  f = int (round (10*(t-60*m-s)));
-  h = int (m/60); m = int (m-60*h);
-  text = sprintf "%03d%02d%02d%d" (h,m,s,f);
-  msgs = zipwith m (66..73) (reverse (list text)) with
-    m num c = ctl (ord c) num 17;
+mcptime p = process with
+  process t = vector msgs when
+    m = int (t/60); s = int (t-60*m);
+    f = int (round (10*(t-60*m-s)));
+    h = int (m/60); m = int (m-60*h);
+    text = sprintf "%03d%02d%02d%d" (h,m,s,f);
+    msgs = zipwith m (66..73) (reverse (list text)) with
+      m num c = ctl (ord c) num chan;
+    end;
   end;
+end when
+  chan = (p-1)*16+1;
 end;

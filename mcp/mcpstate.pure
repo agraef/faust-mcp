@@ -1,5 +1,5 @@
 
-public ctl bend touch strip view sysex pd_delay;
+public note ctl bend touch strip view sysex pd_delay;
 nonfix bang write clear reload;
 
 using system;
