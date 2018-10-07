@@ -1,6 +1,15 @@
 
 using mcpstate;
 
+// Try to figure out whether bendin is the broken one from vanilla.
+let bendin_min = if vanilla then 0 else -8192 when
+  // Only purr-data has this symbol, so this gives us a quick check to see
+  // whether we need to adjust for vanilla's broken bendin. NOTE: This won't
+  // detect pd-l2ork v1 which also has bendin fixed in the latest versions, so
+  // if you're still running that then you'll have to set this flag manually.
+  vanilla = ~pointerp (addr "gui_vmess");
+end;
+
 mcp2ctl (note num val _) = case int num of
   46 = if bank_left then out else () if val > 0;
   47 = if bank_right then out else () if val > 0;
@@ -44,7 +53,7 @@ mcp2ctl (bend val chan) = convert (bend val (channel chan)) with
   channel chan = (int chan-1) mod 16 + 1;
   convert (bend val chan) = ctl v num ccchan when
     ccchan = mcp::getccchan num;
-    v = (val+8192)/128;
+    v = (val-bendin_min)/128;
     pd_send "midiout" (ctl v num ccchan);
     mcp::getview && pd_send "midistrip" (view (chan-1) 1);
   end if num >= 0 when
