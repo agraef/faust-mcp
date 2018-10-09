@@ -1,11 +1,16 @@
 
-public note ctl bend touch strip view sysex pd_delay;
+public note ctl bend touch strip view select mute solo rec sysex pd_delay;
 nonfix bang write clear reload;
 
-using system;
+using orddict, system;
 
 extern void pd_send(char*, expr*);
 extern void pd_post(char*);
+extern void pd_receive(char*);
+extern void pd_unreceive(char*);
+
+// quick check whether we're running in vanilla Pd or Purr Data
+let vanilla = ~pointerp (addr "gui_vmess"); // only Purr Data has this symbol
 
 namespace mcp;
 
@@ -28,6 +33,7 @@ let ccval = { ref 0 | i = 0..127 };
 let ccmap = { ref i | i = 0..127 };
 let ccrmap = { ref i | i = 0..127 };
 let ccstrip = { ref i | i = 0..127 };
+let ccstripval = orddict [];
 
 reinit = () when
   put offs false;
@@ -36,6 +42,7 @@ reinit = () when
   dowith (\r v -> put r v) ccmap (vector (0..127));
   dowith (\r v -> put r v) ccrmap (vector (0..127));
   dowith (\r v -> put r v) ccstrip (vector (0..127));
+  clear ccstripval;
 end;
 
 getval num = get (ccval!int num) if num>=0 && num<=127;
@@ -90,3 +97,7 @@ passive num = case getstrip num of
   strip label min max step val num chan = step==0;
   _ = 0;
 end;
+
+setstripval id val = update ccstripval id val;
+getstripval id = ccstripval!id if member ccstripval id;
+= -1 otherwise;

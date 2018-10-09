@@ -1,6 +1,23 @@
 
 using mcpstate;
 
+// Instance names of a scribble strip.
+
+instname label::string = name when
+  name = case split "/" label of
+    label:_ = case split ":" label of
+      label:_ = label;
+      _ = "";
+    end;
+    _ = "";
+  end;
+end;
+
+instname num::number = case mcp::getstrip (mcp::getccnum num) of
+  strip label min max step _ ccnum chan = instname label;
+  _ = "";
+end;
+
 // Helper functions to construct the scribble strip displays.
 
 // map the value of a controller to the real value (same as in pd-faust)
@@ -46,7 +63,7 @@ end;
 
 // clear a strip
 clearstrip num::int =
-{msgs, stripmsg 0 num text, stripmsg 1 num text} when
+{msgs, msgs2, stripmsg 0 num text, stripmsg 1 num text} when
   text = "       ";
   pd_send (sprintf "stripu%d" (int num+1)) "";
   pd_send (sprintf "stripl%d" (int num+1)) "";
@@ -54,12 +71,14 @@ clearstrip num::int =
   // doesn't really belong here, but this is the only place where empty
   // (unassigned) strips will be updated, so it needs to be done here.
   msgs = {touch (num*16) 1, ctl 0 (num+48) 1, bend (-8192) (num+1)};
+  // Update the record/mute indicators.
+  msgs2 = { note (num+offs) 0 1 | offs = [0,16] }
 end if num >= 0 && num <= 7;
 
 // display a strip
 showstrip num = case mcp::getstrip (mcp::getccnum num) of
   strip label min max step _ ccnum chan =
-  {stripmsg 0 num text1, stripmsg 1 num text2} when
+  {msgs, stripmsg 0 num text1, stripmsg 1 num text2} when
     val = mcp::getval ccnum;
     lablst = filter (\s -> ~null s) (split "/" label);
     lablst = if null lablst then ["",""]
@@ -75,6 +94,15 @@ showstrip num = case mcp::getstrip (mcp::getccnum num) of
     text2  = abbrv (last lablst);
     pd_send (sprintf "stripu%d" (int num+1)) text1;
     pd_send (sprintf "stripl%d" (int num+1)) text2;
+    // Update the record/mute indicators.
+    msgs = { note (num+offs) (stripval offs num*127) 1 | offs = [0,16] } with
+      stripval 0 num = if v>=0 then v>0 else 0 when
+	v = mcp::getstripval (join ":" [instname num, "record"]);
+      end;
+      stripval 16 num = if v>=0 then v==0 else 0 when
+	v = mcp::getstripval (join ":" [instname num, "active"]);
+      end;
+    end;
   end;
   _ = clearstrip num otherwise;
 end if num >= 0 && num <= 7;
@@ -92,13 +120,63 @@ showval num flag = case mcp::getstrip (mcp::getccnum num) of
   _ = () otherwise;
 end if num >= 0 && num <= 7;
 
+// send a message to the unit for a given strip
+public mcpstrip;
+sendmsg num sel msg = case mcp::getstrip (mcp::getccnum num) of
+  strip label min max step _ ccnum chan = msgs when
+    name = instname label;
+    addr = if null name then "" else join ":" [name,sel];
+    null addr || pd_send addr msg;
+    // As getting feedback from the GUI is broken in Purr Data (see below), we
+    // simulate that functionality by maintaining the state of the active and
+    // record controls locally. XXXFIXME: This is an awful kludge and will get
+    // confused if you use the corresponding controls in the GUI, so don't!
+    msgs = if vanilla || null addr then ()
+	   else mcpstrip (addr (makeval (default (mcp::getstripval addr)))) with
+	     default v = if sel == "active" then 1 else 0 if v<0;
+	     = v otherwise;
+	     makeval v = ~v if msg === bang;
+	     = msg otherwise;
+	   end;
+  end;
+  _ = () otherwise;
+end if num >= 0 && num <= 7;
+
+// install receivers for the active and record controls
+// XXXFIXME: This crashes Purr Data, thus is disabled there for now, so we get
+// no proper feedback from the GUIs there. We really need to figure out what's
+// wrong in Purr Data there and fix it.
+setrecv num sel = case mcp::getstrip num of
+  strip label min max step _ ccnum chan = () when
+    name = instname label;
+    addr = if null name then "" else join ":" [name,sel];
+    null addr || pd_receive addr;
+  end;
+  _ = () otherwise;
+end if vanilla;
+
+unsetrecv num sel = case mcp::getstrip num of
+  strip label min max step _ ccnum chan = () when
+    name = instname label;
+    addr = if null name then "" else join ":" [name,sel];
+    null addr || pd_unreceive addr;
+  end;
+  _ = () otherwise;
+end if vanilla;
+
 mcpstrip strp@(strip label min max step val num chan) = msgs when
   mcp::setstrip num strp;
+  do (setrecv num) ["active", "record"];
   // Set a timer for this message, to prevent cascades of bang messages when a
   // bunch of strips are updated in quick succession.
   msgs = pd_delay 500 bang;
   //pd_send "midiout" (ctl val num chan);
 end;
+
+// XXXTODO: solo is currently unassigned
+mcpstrip (select num) = sendmsg num "init" bang;
+mcpstrip (mute num) = sendmsg num "active" bang;
+mcpstrip (rec num) = sendmsg num "record" bang;
 
 mcpstrip (view num flag) = showval num flag if flag > 0 && mcp::getview;
 = mcp::setview (int flag) $$ mcpstrip bang otherwise;
@@ -107,8 +185,27 @@ mcpstrip clear = {clearstrip i | i = 0..7};
 
 mcpstrip bang  = {showstrip i | i = 0..7};
 
-mcpstrip reload = mcp::reinit;
+mcpstrip reload = mcp::reinit when
+  do (flip unsetrecv "active") (0..127);
+  do (flip unsetrecv "record") (0..127);
+end;
 
 mcpstrip flag::number = mcp::settoggle (flag > 0) $$ mcpstrip bang;
+
+mcpstrip (id@(_::string) val) = msgs when
+  // record the value for later reuse
+  mcp::setstripval id val;
+  // update all strips in the current bank whose instname matches name
+  msgs = { note (i+offs) val 1 | i = 0..7; instname i == name } when
+    offs = if sel == "record" then 0 else 16;
+    val = if sel == "record" then val>0 else val==0;
+    val = val*127;
+  end;
+end if val ~== bang && ~null name && (sel === "active" || sel === "record") when
+  [name,sel] = case split ":" id of
+    xs@[_,_] = xs;
+    _ = [id,""];
+  end;
+end;
 
 mcpstrip _ = () otherwise;

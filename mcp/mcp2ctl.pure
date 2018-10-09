@@ -2,25 +2,38 @@
 using mcpstate;
 
 // Try to figure out whether bendin is the broken one from vanilla.
-let bendin_min = if vanilla then 0 else -8192 when
-  // Only purr-data has this symbol, so this gives us a quick check to see
-  // whether we need to adjust for vanilla's broken bendin. NOTE: This won't
-  // detect pd-l2ork v1 which also has bendin fixed in the latest versions, so
-  // if you're still running that then you'll have to set this flag manually.
-  vanilla = ~pointerp (addr "gui_vmess");
-end;
+// NOTE: This won't detect pd-l2ork v1 which also has bendin fixed in the
+// latest versions, so if you're still running that then you'll have to set
+// this flag manually.
+let bendin_min = if vanilla then 0 else -8192;
 
 mcp2ctl (note num val _) = case int num of
+  // bank switches
   46 = if bank_left then out else () if val > 0;
   47 = if bank_right then out else () if val > 0;
   48 = if channel_left then out else () if val > 0;
   49 = if channel_right then out else () if val > 0;
+  // fader touches
   _ = () when
     mcp::getview > 1 || pd_send "midistrip" (view (num-104) (val>0));
   end if num >= 104 && num <= 111;
+  // button pushes
   _ = () when
     pd_send "midistrip" (view (num-32) (2*~mcp::getview));
   end if num >= 32 && num <= 39 && val > 0;
+  // select/mute/solo/rec
+  _ = () when
+    pd_send "midistrip" (rec num);
+  end if num >= 0 && num <= 7 && val > 0;
+  _ = () when
+    pd_send "midistrip" (solo (num-8));
+  end if num >= 8 && num <= 15 && val > 0;
+  _ = () when
+    pd_send "midistrip" (mute (num-16));
+  end if num >= 16 && num <= 23 && val > 0;
+  _ = () when
+    pd_send "midistrip" (select (num-24));
+  end if num >= 24 && num <= 31 && val > 0;
   = () otherwise;
 end with
   bank_left = mcp::setoffs num $$ true if num >= 0 when
