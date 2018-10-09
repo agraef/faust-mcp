@@ -46,10 +46,14 @@ end;
 
 // clear a strip
 clearstrip num::int =
-{stripmsg 0 num text, stripmsg 1 num text} when
+{msgs, stripmsg 0 num text, stripmsg 1 num text} when
   text = "       ";
   pd_send (sprintf "stripu%d" (int num+1)) "";
   pd_send (sprintf "stripl%d" (int num+1)) "";
+  // We also reset the encoders, faders and meter strips here. XXXFIXME: This
+  // doesn't really belong here, but this is the only place where empty
+  // (unassigned) strips will be updated, so it needs to be done here.
+  msgs = {touch (num*16) 1, ctl 0 (num+48) 1, bend (-8192) (num+1)};
 end if num >= 0 && num <= 7;
 
 // display a strip

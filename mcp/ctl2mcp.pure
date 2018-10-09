@@ -3,8 +3,12 @@ using mcpstate;
 
 ctl2mcp (ctl val num chan) = convert (ctl val num chan) with
   convert (ctl val num chan) = () if mcp::getccchan num == 0 && chan > 1;
-  = if passive then {touch (num*16+round(val/128*14)) 1}
-    else {ctl (val/12.7+1) (num+48) 1, bend (val*129-8192) (num+1)}
+  = if passive then
+      {touch (num*16+round(val/128*14)) 1,
+       ctl 0 (num+48) 1, bend (-8192) (num+1)}
+    else
+      {touch (num*16) 1,
+       ctl (val/12.7+1) (num+48) 1, bend (val*129-8192) (num+1)}
   when
     mcp::getview && pd_send "midistrip" (view num 1);
   end if num >= 0 && num <= 7 && isstrip when
