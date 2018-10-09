@@ -82,6 +82,8 @@ In addition, the abstraction also offers various other useful functions, mostly 
 
 - **Scribble strips:** Instance/dsp and control names are shown in the scribble strips of the device, and touching the faders or pushing the encoders toggles the value display in the top line of each scribble strip.
 
+- **Faust unit controls:** The rec and mute buttons toggle the record and active controls of the corresponding Faust dsp, and pressing the select button resets the controls to their initial values.
+
 - **Display options:** The following options are assigned to some of the function keys of the MCP device: F1 switches the scribble strips between instance and dsp name of the Faust units; F2 switches the encoder style (i.e., the way the LED rings light up around the encoders); and F3 tells the abstraction to update its internal state and redisplay the scribble strips (which can be used to force an update of the display after edits).
 
 - **Playback and transport:** When used with the included (modified) version of the pd-faust midiosc player, the transport controls will work as follows: the "rewind" key moves the playhead to the beginning of the MIDI file, "fast forward" moves it to the end; "stop" stops, and "play" toggles playback; "record" toggles the player's OSC automation recording; "cycle" toggles the player's loop function; and the big jog wheel and the cursor left/right keys move the playhead in smaller and larger increments, respectively. In addition, the function keys F4, F5 and F6 are assigned to some special OSC recording functions ("save", "abort" and "clear"). Please check the description of the midosc abstraction in the [pd-faust][] documentation for the meaning of these operations.
