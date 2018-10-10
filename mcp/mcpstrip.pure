@@ -173,7 +173,9 @@ mcpstrip strp@(strip label min max step val num chan) = msgs when
   //pd_send "midiout" (ctl val num chan);
 end;
 
-// XXXTODO: solo is currently unassigned
+// XXXTODO: solo is currently same as select, we might want to assign it to a
+// different function
+mcpstrip (solo num) |
 mcpstrip (select num) = sendmsg num "init" bang;
 mcpstrip (mute num) = sendmsg num "active" bang;
 mcpstrip (rec num) = sendmsg num "record" bang;
