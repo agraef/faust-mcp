@@ -63,7 +63,12 @@ end with
 end;
 
 mcp2ctl (bend val chan) = convert (bend val (channel chan)) with
-  channel chan = (int chan-1) mod 16 + 1;
+  // Channel mapping: Pd organizes the MIDI channels into banks of 16 (1..16
+  // on first port, 17..32 for port 2, etc.), but we actually use a modulus of
+  // 8 here, so that the MCP master fader (on channel 9 + 16*portno) gets
+  // remapped to the first fader. This is useful on devices which only have a
+  // single master fader besides the encoders, such as the X-Touch Mini.
+  channel chan = (int chan-1) mod 8 + 1;
   convert (bend val chan) = ctl v num ccchan when
     ccchan = mcp::getccchan num;
     v = (val-bendin_min)/128;
