@@ -9,8 +9,8 @@ let bendin_min = if vanilla then 0 else -8192;
 
 mcp2ctl (note num val _) = case int num of
   // bank switches
-  46 = if bank_left then out else () if val > 0;
-  47 = if bank_right then out else () if val > 0;
+  46 | 84 = if bank_left then out else () if val > 0;
+  47 | 85 = if bank_right then out else () if val > 0;
   48 = if channel_left then out else () if val > 0;
   49 = if channel_right then out else () if val > 0;
   // fader touches
