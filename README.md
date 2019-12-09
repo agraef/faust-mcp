@@ -52,7 +52,7 @@ The synth.pd example also includes a modified version of pd-faust's midiosc play
 
 ### Using the abstraction
 
-To use the abstraction in your own patches, it's enough to copy the mcp folder to the directory containing your patch. If you prefer, you can also install the abstraction by dropping the mcp folder into one of the locations on Pd's library search path, such as ~/.pd-externals on Linux; please check your local Pd documentation for details.
+To use the abstraction in your own patches, it's enough to copy the mcp folder to the directory containing your patch. If you prefer, you can also install the abstraction by dropping the mcp folder into one of the locations on Pd's library search path, such as ~/pd-externals on Linux; please check your local Pd documentation for details.
 
 To insert an instance of the abstraction into your patch, create an object (Ctrl+1) and type `mcp` followed by the MIDI port number to which the MCP device is connected, e.g.:
 
